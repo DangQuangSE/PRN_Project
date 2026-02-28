@@ -2,90 +2,99 @@
 @model FManagement.RazorWepApp.QuangND.Pages.ProductionPlanQuangNds.DetailsModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Plan Details";
 }
 
-<h1>Details</h1>
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-1">
+                <i class="bi bi-info-circle text-primary"></i> Plan Details
+            </h2>
+            <p class="text-muted">View production plan information</p>
+        </div>
+    </div>
 
-<div>
-    <h4>ProductionPlanQuangNd</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.PlanDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.PlanDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.StartTime)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.StartTime)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.EndTime)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.EndTime)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.PlanStatus)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.PlanStatus)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.PriorityLevel)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.PriorityLevel)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.TotalExpectedQuantity)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.TotalExpectedQuantity)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.ActualProducedQuantity)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.ActualProducedQuantity)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.BatchNotes)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.BatchNotes)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.LastModifiedBy)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.LastModifiedBy)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.IsDeleted)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.IsDeleted)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.Kitchen)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.Kitchen.KitchenName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.StoreOrderItem)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.StoreOrderItem.OrderItemId)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.ProductionPlanQuangNd.PlanId">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="row">
+                <!-- Left Column -->
+                <div class="col-md-6">
+                    <h5 class="text-primary mb-3"><i class="bi bi-info-circle"></i> Basic Information</h5>
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th class="text-muted" style="width:40%"><i class="bi bi-calendar3"></i> Plan Date</th>
+                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.PlanDate)</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-clock"></i> Start Time</th>
+                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.StartTime)</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-clock-fill"></i> End Time</th>
+                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.EndTime)</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-flag"></i> Status</th>
+                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.PlanStatus)</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-exclamation-triangle"></i> Priority</th>
+                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.PriorityLevel)</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-building"></i> Kitchen</th>
+                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.Kitchen.KitchenName)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Right Column -->
+                <div class="col-md-6">
+                    <h5 class="text-primary mb-3"><i class="bi bi-gear"></i> Production Details</h5>
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th class="text-muted" style="width:40%"><i class="bi bi-box"></i> Expected Qty</th>
+                                <td><strong class="text-primary">@Html.DisplayFor(model => model.ProductionPlanQuangNd.TotalExpectedQuantity)</strong></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-box-seam"></i> Actual Qty</th>
+                                <td><strong class="text-success">@Html.DisplayFor(model => model.ProductionPlanQuangNd.ActualProducedQuantity)</strong></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-cart"></i> Order Item</th>
+                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.StoreOrderItem.OrderItemId)</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-sticky"></i> Notes</th>
+                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.BatchNotes)</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-person"></i> Modified By</th>
+                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.LastModifiedBy)</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-trash"></i> Deleted</th>
+                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.IsDeleted)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <hr class="my-3" />
+
+            <div class="d-flex justify-content-between">
+                <a asp-page="./Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to List
+                </a>
+                <a asp-page="./Edit" asp-route-id="@Model.ProductionPlanQuangNd.PlanId" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+            </div>
+        </div>
+    </div>
 </div>

@@ -81,14 +81,18 @@
                                 <label asp-for="ProductionPlanQuangNd.PlanStatus" class="form-label fw-semibold">
                                     <i class="bi bi-flag"></i> Status
                                 </label>
-                                <input asp-for="ProductionPlanQuangNd.PlanStatus" class="form-control" />
+                                <select asp-for="ProductionPlanQuangNd.PlanStatus" class="form-select" asp-items="ViewBag.PlanStatusList">
+                                    <option value="">-- Select Status --</option>
+                                </select>
                                 <span asp-validation-for="ProductionPlanQuangNd.PlanStatus" class="text-danger"></span>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label asp-for="ProductionPlanQuangNd.PriorityLevel" class="form-label fw-semibold">
                                     <i class="bi bi-exclamation-triangle"></i> Priority
                                 </label>
-                                <input asp-for="ProductionPlanQuangNd.PriorityLevel" class="form-control" />
+                                <select asp-for="ProductionPlanQuangNd.PriorityLevel" class="form-select" asp-items="ViewBag.PriorityLevelList">
+                                    <option value="">-- Select Priority --</option>
+                                </select>
                                 <span asp-validation-for="ProductionPlanQuangNd.PriorityLevel" class="text-danger"></span>
                             </div>
                         </div>
