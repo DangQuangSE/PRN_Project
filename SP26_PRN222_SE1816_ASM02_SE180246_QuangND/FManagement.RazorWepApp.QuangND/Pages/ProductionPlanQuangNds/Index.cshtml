@@ -150,82 +150,129 @@
 @section Scripts {
     <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
     <script>
-        const connection = new signalR.HubConnectionBuilder()
+        "use strict";
+
+        // Khởi tạo kết nối SignalR
+        var connection = new signalR.HubConnectionBuilder()
             .withUrl("/productionPlanHub")
-            .withAutomaticReconnect()
             .build();
 
-        connection.on("ProductionPlanDeleted", function (planId) {
-            console.log("Production plan deleted: " + planId);
-            
-            const row = document.querySelector(`tr[data-plan-id="${planId}"]`);
+        // Bắt đầu kết nối
+        connection.start().then(function () {
+            console.log("QuangND: Connected to SignalR Hub");
+        }).catch(function (err) {
+            console.error("Error connecting to SignalR Hub: " + err.toString());
+        });
+
+        // Helper: tạo row HTML cho một plan
+        function createPlanRow(plan) {
+            var trHtml = `
+                <tr data-plan-id="${plan.planId}">
+                    <td><i class="bi bi-calendar3 text-muted"></i> ${plan.planDate ?? ''}</td>
+                    <td>${plan.startTime ? new Date(plan.startTime).toLocaleString() : ''}</td>
+                    <td>${plan.endTime ? new Date(plan.endTime).toLocaleString() : ''}</td>
+                    <td>${plan.planStatus ?? ''}</td>
+                    <td class="text-center">${plan.priorityLevel ?? ''}</td>
+                    <td class="text-center"><strong class="text-primary">${plan.totalExpectedQuantity ?? ''}</strong></td>
+                    <td class="text-center"><strong class="text-success">${plan.actualProducedQuantity ?? ''}</strong></td>
+                    <td><small class="text-muted">${plan.batchNotes ?? ''}</small></td>
+                    <td>${plan.lastModifiedBy ?? ''}</td>
+                    <td>${plan.isDeleted}</td>
+                    <td><i class="bi bi-building text-muted"></i> ${plan.kitchen?.kitchenName ?? ''}</td>
+                    <td>${plan.storeOrderItemId ?? ''}</td>
+                    <td class="text-center">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <a href="/ProductionPlanQuangNds/Edit?id=${plan.planId}" class="btn btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
+                            <a href="/ProductionPlanQuangNds/Details?id=${plan.planId}" class="btn btn-outline-info" title="Details"><i class="bi bi-eye"></i></a>
+                            <a href="/ProductionPlanQuangNds/Delete?id=${plan.planId}" class="btn btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></a>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return trHtml;
+        }
+
+        // Helper: hiển thị empty state khi bảng trống
+        function showEmptyState() {
+            var tbody = document.getElementById('productionPlansTableBody');
+            if (tbody.querySelectorAll('tr[data-plan-id]').length === 0) {
+                tbody.innerHTML = '<tr><td colspan="13" class="text-center py-5"><i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i><p class="text-muted mt-2">No production plans found.</p></td></tr>';
+            }
+        }
+
+        // RECEIVER - Lắng nghe event delete từ server
+        connection.on("Receiver_DeleteProductionPlan", function (planId) {
+            console.log("Received delete event for plan ID: " + planId);
+
+            var row = document.querySelector('tr[data-plan-id="' + planId + '"]');
             if (row) {
-                row.style.opacity = '0.5';
-                setTimeout(() => {
-                    row.remove();
-                    
-                    const tbody = document.getElementById('productionPlansTableBody');
-                    if (tbody.children.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="13" class="text-center py-5"><i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i><p class="text-muted mt-2">No production plans found.</p></td></tr>';
-                    }
-                }, 300);
+                row.style.transition = 'opacity 0.3s ease-out';
+                row.style.opacity = '0';
+                setTimeout(function () { row.remove(); showEmptyState(); }, 300);
             }
         });
 
-        connection.start()
-            .then(() => {
-                console.log("SignalR Connected to Production Plan Hub");
-            })
-            .catch(err => {
-                console.error("SignalR Connection Error: ", err);
-                setTimeout(() => connection.start(), 5000);
-            });
+        // RECEIVER - Lắng nghe sự kiện tạo mới
+        connection.on("Receiver_CreateProductionPlan", function (item) {
+            console.log("New production plan created: ", item);
 
-        connection.onreconnecting((error) => {
-            console.log("SignalR Reconnecting...", error);
+            var tbody = document.getElementById('productionPlansTableBody');
+
+            // Xóa empty state nếu có
+            var emptyRow = tbody.querySelector('td[colspan]');
+            if (emptyRow) emptyRow.closest('tr').remove();
+
+            // Không thêm nếu đã tồn tại
+            if (tbody.querySelector('tr[data-plan-id="' + item.planId + '"]')) return;
+
+            var trHtml = createPlanRow(item);
+            tbody.insertAdjacentHTML('afterbegin', trHtml);
         });
 
-        connection.onreconnected((connectionId) => {
-            console.log("SignalR Reconnected. Connection ID: " + connectionId);
+        // RECEIVER - Lắng nghe sự kiện cập nhật
+        connection.on("Receiver_UpdateProductionPlan", function (item) {
+            console.log("Production plan updated: ", item);
+
+            // Reload trang để hiển thị dữ liệu mới nhất
+            location.reload();
         });
 
-        connection.onclose((error) => {
-            console.log("SignalR Connection Closed", error);
-            setTimeout(() => connection.start(), 5000);
+        // Lắng nghe error từ server
+        connection.on("Error", function (errorMessage) {
+            console.error("Error from server: " + errorMessage);
         });
+
+
     </script>
 
     <script>
         // Client-side filtering
         function applyFilters() {
-            const status = document.getElementById('filterStatus').value.toLowerCase();
-            const fromDate = document.getElementById('filterFromDate').value;
-            const toDate = document.getElementById('filterToDate').value;
-            const search = document.getElementById('filterSearch').value.toLowerCase();
-            const rows = document.querySelectorAll('#productionPlansTableBody tr[data-plan-id]');
+            var status = document.getElementById('filterStatus').value.toLowerCase();
+            var fromDate = document.getElementById('filterFromDate').value;
+            var toDate = document.getElementById('filterToDate').value;
+            var search = document.getElementById('filterSearch').value.toLowerCase();
+            var rows = document.querySelectorAll('#productionPlansTableBody tr[data-plan-id]');
 
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                const rowStatus = (cells[3]?.textContent || '').trim().toLowerCase();
-                const rowDate = (cells[0]?.textContent || '').trim();
-                const rowText = row.textContent.toLowerCase();
+            rows.forEach(function (row) {
+                var cells = row.querySelectorAll('td');
+                var rowStatus = (cells[3] ? cells[3].textContent : '').trim().toLowerCase();
+                var rowDate = (cells[0] ? cells[0].textContent : '').trim();
+                var rowText = row.textContent.toLowerCase();
 
-                let show = true;
+                var show = true;
 
-                // Status filter
                 if (status && rowStatus !== status) show = false;
 
-                // Date filters
                 if (fromDate && rowDate) {
-                    const d = new Date(rowDate);
+                    var d = new Date(rowDate);
                     if (!isNaN(d) && d < new Date(fromDate)) show = false;
                 }
                 if (toDate && rowDate) {
-                    const d = new Date(rowDate);
+                    var d = new Date(rowDate);
                     if (!isNaN(d) && d > new Date(toDate)) show = false;
                 }
 
-                // Text search
                 if (search && !rowText.includes(search)) show = false;
 
                 row.style.display = show ? '' : 'none';
@@ -237,7 +284,7 @@
             document.getElementById('filterFromDate').value = '';
             document.getElementById('filterToDate').value = '';
             document.getElementById('filterSearch').value = '';
-            document.querySelectorAll('#productionPlansTableBody tr[data-plan-id]').forEach(row => {
+            document.querySelectorAll('#productionPlansTableBody tr[data-plan-id]').forEach(function (row) {
                 row.style.display = '';
             });
         }
@@ -267,3 +314,4 @@
         }
     </style>
 }
+

@@ -17,7 +17,8 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <div class="row">
+            <div class="row" id="ProductionPlanDetails">
+                @Html.HiddenFor(model => model.ProductionPlanQuangNd.PlanId)
                 <!-- Left Column -->
                 <div class="col-md-6">
                     <h5 class="text-primary mb-3"><i class="bi bi-info-circle"></i> Basic Information</h5>
@@ -25,27 +26,27 @@
                         <tbody>
                             <tr>
                                 <th class="text-muted" style="width:40%"><i class="bi bi-calendar3"></i> Plan Date</th>
-                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.PlanDate)</td>
+                                <td id="ProductionPlanQuangNd_PlanDate">@Html.DisplayFor(model => model.ProductionPlanQuangNd.PlanDate)</td>
                             </tr>
                             <tr>
                                 <th class="text-muted"><i class="bi bi-clock"></i> Start Time</th>
-                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.StartTime)</td>
+                                <td id="ProductionPlanQuangNd_StartTime">@Html.DisplayFor(model => model.ProductionPlanQuangNd.StartTime)</td>
                             </tr>
                             <tr>
                                 <th class="text-muted"><i class="bi bi-clock-fill"></i> End Time</th>
-                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.EndTime)</td>
+                                <td id="ProductionPlanQuangNd_EndTime">@Html.DisplayFor(model => model.ProductionPlanQuangNd.EndTime)</td>
                             </tr>
                             <tr>
                                 <th class="text-muted"><i class="bi bi-flag"></i> Status</th>
-                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.PlanStatus)</td>
+                                <td id="ProductionPlanQuangNd_PlanStatus">@Html.DisplayFor(model => model.ProductionPlanQuangNd.PlanStatus)</td>
                             </tr>
                             <tr>
                                 <th class="text-muted"><i class="bi bi-exclamation-triangle"></i> Priority</th>
-                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.PriorityLevel)</td>
+                                <td id="ProductionPlanQuangNd_PriorityLevel">@Html.DisplayFor(model => model.ProductionPlanQuangNd.PriorityLevel)</td>
                             </tr>
                             <tr>
                                 <th class="text-muted"><i class="bi bi-building"></i> Kitchen</th>
-                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.Kitchen.KitchenName)</td>
+                                <td id="ProductionPlanQuangNd_KitchenName">@Html.DisplayFor(model => model.ProductionPlanQuangNd.Kitchen.KitchenName)</td>
                             </tr>
                         </tbody>
                     </table>
@@ -58,27 +59,27 @@
                         <tbody>
                             <tr>
                                 <th class="text-muted" style="width:40%"><i class="bi bi-box"></i> Expected Qty</th>
-                                <td><strong class="text-primary">@Html.DisplayFor(model => model.ProductionPlanQuangNd.TotalExpectedQuantity)</strong></td>
+                                <td id="ProductionPlanQuangNd_TotalExpectedQuantity"><strong class="text-primary">@Html.DisplayFor(model => model.ProductionPlanQuangNd.TotalExpectedQuantity)</strong></td>
                             </tr>
                             <tr>
                                 <th class="text-muted"><i class="bi bi-box-seam"></i> Actual Qty</th>
-                                <td><strong class="text-success">@Html.DisplayFor(model => model.ProductionPlanQuangNd.ActualProducedQuantity)</strong></td>
+                                <td id="ProductionPlanQuangNd_ActualProducedQuantity"><strong class="text-success">@Html.DisplayFor(model => model.ProductionPlanQuangNd.ActualProducedQuantity)</strong></td>
                             </tr>
                             <tr>
                                 <th class="text-muted"><i class="bi bi-cart"></i> Order Item</th>
-                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.StoreOrderItem.OrderItemId)</td>
+                                <td id="ProductionPlanQuangNd_StoreOrderItemId">@Html.DisplayFor(model => model.ProductionPlanQuangNd.StoreOrderItem.OrderItemId)</td>
                             </tr>
                             <tr>
                                 <th class="text-muted"><i class="bi bi-sticky"></i> Notes</th>
-                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.BatchNotes)</td>
+                                <td id="ProductionPlanQuangNd_BatchNotes">@Html.DisplayFor(model => model.ProductionPlanQuangNd.BatchNotes)</td>
                             </tr>
                             <tr>
                                 <th class="text-muted"><i class="bi bi-person"></i> Modified By</th>
-                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.LastModifiedBy)</td>
+                                <td id="ProductionPlanQuangNd_LastModifiedBy">@Html.DisplayFor(model => model.ProductionPlanQuangNd.LastModifiedBy)</td>
                             </tr>
                             <tr>
                                 <th class="text-muted"><i class="bi bi-trash"></i> Deleted</th>
-                                <td>@Html.DisplayFor(model => model.ProductionPlanQuangNd.IsDeleted)</td>
+                                <td id="ProductionPlanQuangNd_IsDeleted">@Html.DisplayFor(model => model.ProductionPlanQuangNd.IsDeleted)</td>
                             </tr>
                         </tbody>
                     </table>
@@ -98,3 +99,52 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+    <script>
+        "use strict";
+
+        var connection = new signalR.HubConnectionBuilder().withUrl("/productionPlanHub").build();
+
+        connection.start().then(function () {
+            console.log("QuangND: Connected to the SignalR Hub");
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        // RECEIVER - Lắng nghe sự kiện cập nhật
+        connection.on("Receiver_UpdateProductionPlan", function (item) {
+            console.log(item);
+
+            var currentPlanId = document.getElementById("ProductionPlanQuangNd_PlanId").value;
+
+            if (currentPlanId == item.planId) {
+                document.getElementById("ProductionPlanQuangNd_PlanDate").innerHTML = item.planDate || '';
+                document.getElementById("ProductionPlanQuangNd_StartTime").innerHTML = item.startTime ? new Date(item.startTime).toLocaleString() : '';
+                document.getElementById("ProductionPlanQuangNd_EndTime").innerHTML = item.endTime ? new Date(item.endTime).toLocaleString() : '';
+                document.getElementById("ProductionPlanQuangNd_PlanStatus").innerHTML = item.planStatus || '';
+                document.getElementById("ProductionPlanQuangNd_PriorityLevel").innerHTML = item.priorityLevel || '';
+                document.getElementById("ProductionPlanQuangNd_KitchenName").innerHTML = item.kitchen?.kitchenName || '';
+                document.getElementById("ProductionPlanQuangNd_TotalExpectedQuantity").innerHTML = item.totalExpectedQuantity || '';
+                document.getElementById("ProductionPlanQuangNd_ActualProducedQuantity").innerHTML = item.actualProducedQuantity || '';
+                document.getElementById("ProductionPlanQuangNd_StoreOrderItemId").innerHTML = item.storeOrderItemId || '';
+                document.getElementById("ProductionPlanQuangNd_BatchNotes").innerHTML = item.batchNotes || '';
+                document.getElementById("ProductionPlanQuangNd_LastModifiedBy").innerHTML = item.lastModifiedBy || '';
+                document.getElementById("ProductionPlanQuangNd_IsDeleted").innerHTML = item.isDeleted;
+            }
+        });
+
+        // RECEIVER - Lắng nghe sự kiện xóa
+        connection.on("Receiver_DeleteProductionPlan", function (planId) {
+            var currentPlanId = document.getElementById("ProductionPlanQuangNd_PlanId").value;
+
+            if (currentPlanId == planId) {
+                document.getElementById("ProductionPlanDetails").innerHTML = '<div class="alert alert-danger text-center"><i class="bi bi-exclamation-triangle"></i> This production plan has been deleted.</div>';
+            } else {
+                alert("Production plan #" + planId + " has been deleted.");
+            }
+        });
+    </script>
+}
+
