@@ -15,11 +15,15 @@ namespace FManagement.RazorWepApp.QuangND.Pages.ProductionPlanQuangNds
     {
         private readonly IProductPlanQuangNDService _productPlanQuangNDService;
         private readonly StoreOrderItemQuangNDService _storeOrderItemQuangNDService;
+        private readonly ICentralKitchenService _centralKitchenService;
 
-        public EditModel(IProductPlanQuangNDService productionPlanSV, StoreOrderItemQuangNDService storeOrderSV)
+        public EditModel(IProductPlanQuangNDService productionPlanSV, 
+            StoreOrderItemQuangNDService storeOrderSV,
+            ICentralKitchenService centralKitchenService)
         {
             _productPlanQuangNDService = productionPlanSV;
             _storeOrderItemQuangNDService = storeOrderSV;
+            _centralKitchenService = centralKitchenService;
         }
 
         [BindProperty]
@@ -38,18 +42,15 @@ namespace FManagement.RazorWepApp.QuangND.Pages.ProductionPlanQuangNds
                 return NotFound();
             }
             ProductionPlanQuangNd = productionplanquangnd;
-            //ViewData["KitchenId"] = new SelectList(_context.CentralKitchens, "KitchenId", "KitchenName");
-            var StoreOrderItemQuangNds = await _storeOrderItemQuangNDService.GetAllAsync();
-            ViewData["StoreOrderItemId"] = new SelectList(StoreOrderItemQuangNds, "OrderItemId", "OrderItemId");
+            await PopulateDropdownsAsync(productionplanquangnd);
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
+                await PopulateDropdownsAsync(ProductionPlanQuangNd);
                 return Page();
             }
 
@@ -57,10 +58,34 @@ namespace FManagement.RazorWepApp.QuangND.Pages.ProductionPlanQuangNds
             if (result > 0)
             {
                 return RedirectToPage("./Index");
-
             }
+            await PopulateDropdownsAsync(ProductionPlanQuangNd);
             return Page();
+        }
 
+        private async Task PopulateDropdownsAsync(ProductionPlanQuangNd? plan = null)
+        {
+            var storeOrderItems = await _storeOrderItemQuangNDService.GetAllAsync();
+            var storeOrderItemList = storeOrderItems.Select(s => new
+            {
+                s.OrderItemId,
+                DisplayText = $"#{s.OrderItemId} - {s.Product?.ProductName ?? "N/A"} (Qty: {s.QuantityOrdered})"
+            }).ToList();
+            ViewData["StoreOrderItemId"] = new SelectList(storeOrderItemList, "OrderItemId", "DisplayText", plan?.StoreOrderItemId);
+
+            var kitchens = await _centralKitchenService.GetAllAsync();
+            ViewData["KitchenId"] = new SelectList(kitchens, "KitchenId", "KitchenName", plan?.KitchenId);
+
+            var statusList = new List<string> { "Pending", "In Progress", "Completed", "Cancelled" };
+            ViewData["PlanStatusList"] = new SelectList(statusList, plan?.PlanStatus);
+
+            var priorityList = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "0", Text = "Low" },
+                new SelectListItem { Value = "1", Text = "Medium" },
+                new SelectListItem { Value = "2", Text = "High" }
+            };
+            ViewData["PriorityLevelList"] = new SelectList(priorityList, "Value", "Text", plan?.PriorityLevel?.ToString());
         }
     }
 }

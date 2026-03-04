@@ -14,6 +14,7 @@ internal class Program
         builder.Services.AddScoped<IProductPlanQuangNDService, ProductPlanQuangNDService>();
         builder.Services.AddScoped<StoreOrderItemQuangNDService>();
         builder.Services.AddScoped<SystemAccountService>();
+        builder.Services.AddScoped<ICentralKitchenService, CentralKitchenService>();
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(options =>
         {

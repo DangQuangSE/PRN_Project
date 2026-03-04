@@ -5,398 +5,313 @@
     ViewData["Title"] = "Production Plans";
 }
 
-<style>
-    .page-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 10px;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="bi bi-calendar-check text-primary"></i> Production Plans Management
+                    </h2>
+                    <p class="text-muted mb-0">Manage and track your production schedules</p>
+                </div>
+                <div>
+                    <a asp-page="Create" class="btn btn-primary btn-lg shadow-sm">
+                        <i class="bi bi-plus-circle"></i> Create New Plan
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    .page-header h1 {
-        margin: 0;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .page-header h1 i {
-        font-size: 2.5rem;
-    }
-
-    .btn-create {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 0.75rem 2rem;
-        border-radius: 25px;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        border: none;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    }
-
-    .btn-create:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-        color: white;
-    }
-
-    .btn-create i {
-        font-size: 1.2rem;
-    }
-
-    .table-container {
-        background: white;
-        border-radius: 10px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        overflow-x: auto;
-    }
-
-    .table {
-        margin-bottom: 0;
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-
-    .table thead {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .table thead th {
-        color: white;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        padding: 1rem 0.75rem;
-        border: none;
-        white-space: nowrap;
-    }
-
-    .table thead th:first-child {
-        border-top-left-radius: 8px;
-    }
-
-    .table thead th:last-child {
-        border-top-right-radius: 8px;
-    }
-
-    .table tbody tr {
-        transition: all 0.3s ease;
-        border-bottom: 1px solid #e9ecef;
-    }
-
-    .table tbody tr:hover {
-        background-color: #f8f9fa;
-        transform: scale(1.01);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .table tbody td {
-        padding: 1rem 0.75rem;
-        vertical-align: middle;
-        color: #495057;
-    }
-
-    .table tbody tr:last-child {
-        border-bottom: none;
-    }
-
-    .action-links {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: nowrap;
-    }
-
-    .action-links a {
-        padding: 0.4rem 0.8rem;
-        border-radius: 5px;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 0.875rem;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3rem;
-        white-space: nowrap;
-    }
-
-    .action-links a:nth-child(1) {
-        background-color: #ffc107;
-        color: #000;
-    }
-
-    .action-links a:nth-child(1):hover {
-        background-color: #ffb300;
-        transform: translateY(-2px);
-        box-shadow: 0 2px 8px rgba(255, 193, 7, 0.4);
-    }
-
-    .action-links a:nth-child(3) {
-        background-color: #17a2b8;
-        color: white;
-    }
-
-    .action-links a:nth-child(3):hover {
-        background-color: #138496;
-        transform: translateY(-2px);
-        box-shadow: 0 2px 8px rgba(23, 162, 184, 0.4);
-    }
-
-    .action-links a:nth-child(5) {
-        background-color: #dc3545;
-        color: white;
-    }
-
-    .action-links a:nth-child(5):hover {
-        background-color: #c82333;
-        transform: translateY(-2px);
-        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
-    }
-
-    .badge {
-        padding: 0.4rem 0.8rem;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        display: inline-block;
-    }
-
-    .badge-success {
-        background-color: #28a745;
-        color: white;
-    }
-
-    .badge-warning {
-        background-color: #ffc107;
-        color: #000;
-    }
-
-    .badge-danger {
-        background-color: #dc3545;
-        color: white;
-    }
-
-    .badge-info {
-        background-color: #17a2b8;
-        color: white;
-    }
-
-    .priority-high {
-        color: #dc3545;
-        font-weight: 700;
-    }
-
-    .priority-medium {
-        color: #ffc107;
-        font-weight: 600;
-    }
-
-    .priority-low {
-        color: #28a745;
-        font-weight: 500;
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 3rem;
-        color: #6c757d;
-    }
-
-    .empty-state i {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
-    }
-
-    .row-deleting {
-        opacity: 0.5;
-        transition: opacity 0.3s ease-out;
-    }
-
-    @@media (max-width: 768px) {
-        .page-header h1 {
-            font-size: 1.5rem;
-        }
-
-        .table-container {
-            padding: 0.5rem;
-        }
-
-        .action-links {
-            flex-direction: column;
-        }
-    }
-</style>
-
-<div class="page-header">
-    <h1>
-        <i class="fas fa-clipboard-list"></i>
-        Production Plans Management
-    </h1>
-</div>
-
-<p class="mb-4">
-    <a asp-page="Create" class="btn-create">
-        <i class="fas fa-plus-circle"></i>
-        Create New Production Plan
-    </a>
-</p>
-
-<div class="table-container">
-    <table class="table" id="productionPlansTable">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.ProductionPlanQuangNd[0].PlanDate)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ProductionPlanQuangNd[0].StartTime)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ProductionPlanQuangNd[0].EndTime)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ProductionPlanQuangNd[0].PlanStatus)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ProductionPlanQuangNd[0].PriorityLevel)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ProductionPlanQuangNd[0].TotalExpectedQuantity)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ProductionPlanQuangNd[0].ActualProducedQuantity)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ProductionPlanQuangNd[0].BatchNotes)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ProductionPlanQuangNd[0].LastModifiedBy)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ProductionPlanQuangNd[0].IsDeleted)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ProductionPlanQuangNd[0].Kitchen)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ProductionPlanQuangNd[0].StoreOrderItem)
-                </th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="productionPlansTableBody">
-    @foreach (var item in Model.ProductionPlanQuangNd) {
-            <tr data-plan-id="@item.PlanId">
-                <td>
-                    @Html.DisplayFor(modelItem => item.PlanDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.StartTime)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EndTime)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PlanStatus)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PriorityLevel)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.TotalExpectedQuantity)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ActualProducedQuantity)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.BatchNotes)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LastModifiedBy)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.IsDeleted)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Kitchen.KitchenName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.StoreOrderItem.OrderItemId)
-                </td>
-                <td>
-                    <div class="action-links">
-                        <a asp-page="./Edit" asp-route-id="@item.PlanId">
-                            <i class="fas fa-edit"></i> Edit
-                        </a> |
-                        <a asp-page="./Details" asp-route-id="@item.PlanId">
-                            <i class="fas fa-info-circle"></i> Details
-                        </a> |
-                        <a asp-page="./Delete" asp-route-id="@item.PlanId">
-                            <i class="fas fa-trash-alt"></i> Delete
-                        </a>
+    <!-- Filter & Search Section -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-flag"></i> Plan Status
+                    </label>
+                    <select id="filterStatus" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-calendar-event"></i> From Date
+                    </label>
+                    <input type="date" id="filterFromDate" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-calendar-event"></i> To Date
+                    </label>
+                    <input type="date" id="filterToDate" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-search"></i> Search
+                    </label>
+                    <input type="text" id="filterSearch" class="form-control" placeholder="Search notes, kitchen..." />
+                </div>
+                <div class="col-md-2">
+                    <div class="d-grid gap-2 d-md-flex">
+                        <button type="button" class="btn btn-primary" onclick="applyFilters()">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">
+                            <i class="bi bi-x-circle"></i> Clear
+                        </button>
                     </div>
-                </td>
-            </tr>
-    }
-        </tbody>
-    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="productionPlansTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Plan Date</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Status</th>
+                            <th class="text-center">Priority</th>
+                            <th class="text-center">Expected Qty</th>
+                            <th class="text-center">Actual Qty</th>
+                            <th>Notes</th>
+                            <th>Modified By</th>
+                            <th>Deleted</th>
+                            <th>Kitchen</th>
+                            <th>Order Item</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productionPlansTableBody">
+                @foreach (var item in Model.ProductionPlanQuangNd) {
+                        <tr data-plan-id="@item.PlanId">
+                            <td>
+                                <i class="bi bi-calendar3 text-muted"></i>
+                                @Html.DisplayFor(modelItem => item.PlanDate)
+                            </td>
+                            <td>@Html.DisplayFor(modelItem => item.StartTime)</td>
+                            <td>@Html.DisplayFor(modelItem => item.EndTime)</td>
+                            <td>@Html.DisplayFor(modelItem => item.PlanStatus)</td>
+                            <td class="text-center">@Html.DisplayFor(modelItem => item.PriorityLevel)</td>
+                            <td class="text-center">
+                                <strong class="text-primary">@Html.DisplayFor(modelItem => item.TotalExpectedQuantity)</strong>
+                            </td>
+                            <td class="text-center">
+                                <strong class="text-success">@Html.DisplayFor(modelItem => item.ActualProducedQuantity)</strong>
+                            </td>
+                            <td>
+                                <small class="text-muted">@Html.DisplayFor(modelItem => item.BatchNotes)</small>
+                            </td>
+                            <td>@Html.DisplayFor(modelItem => item.LastModifiedBy)</td>
+                            <td>@Html.DisplayFor(modelItem => item.IsDeleted)</td>
+                            <td>
+                                <i class="bi bi-building text-muted"></i>
+                                @Html.DisplayFor(modelItem => item.Kitchen.KitchenName)
+                            </td>
+                            <td>@Html.DisplayFor(modelItem => item.StoreOrderItem.OrderItemId)</td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a asp-page="./Edit" asp-route-id="@item.PlanId"
+                                       class="btn btn-outline-primary" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-page="./Details" asp-route-id="@item.PlanId"
+                                       class="btn btn-outline-info" title="Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-page="./Delete" asp-route-id="@item.PlanId"
+                                       class="btn btn-outline-danger" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
     <script>
-        const connection = new signalR.HubConnectionBuilder()
+        "use strict";
+
+        // Khởi tạo kết nối SignalR
+        var connection = new signalR.HubConnectionBuilder()
             .withUrl("/productionPlanHub")
-            .withAutomaticReconnect()
             .build();
 
-        connection.on("ProductionPlanDeleted", function (planId) {
-            console.log("Production plan deleted: " + planId);
-            
-            const row = document.querySelector(`tr[data-plan-id="${planId}"]`);
+        // Bắt đầu kết nối
+        connection.start().then(function () {
+            console.log("QuangND: Connected to SignalR Hub");
+        }).catch(function (err) {
+            console.error("Error connecting to SignalR Hub: " + err.toString());
+        });
+
+        // Helper: tạo row HTML cho một plan
+        function createPlanRow(plan) {
+            var trHtml = `
+                <tr data-plan-id="${plan.planId}">
+                    <td><i class="bi bi-calendar3 text-muted"></i> ${plan.planDate ?? ''}</td>
+                    <td>${plan.startTime ? new Date(plan.startTime).toLocaleString() : ''}</td>
+                    <td>${plan.endTime ? new Date(plan.endTime).toLocaleString() : ''}</td>
+                    <td>${plan.planStatus ?? ''}</td>
+                    <td class="text-center">${plan.priorityLevel ?? ''}</td>
+                    <td class="text-center"><strong class="text-primary">${plan.totalExpectedQuantity ?? ''}</strong></td>
+                    <td class="text-center"><strong class="text-success">${plan.actualProducedQuantity ?? ''}</strong></td>
+                    <td><small class="text-muted">${plan.batchNotes ?? ''}</small></td>
+                    <td>${plan.lastModifiedBy ?? ''}</td>
+                    <td>${plan.isDeleted}</td>
+                    <td><i class="bi bi-building text-muted"></i> ${plan.kitchen?.kitchenName ?? ''}</td>
+                    <td>${plan.storeOrderItemId ?? ''}</td>
+                    <td class="text-center">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <a href="/ProductionPlanQuangNds/Edit?id=${plan.planId}" class="btn btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
+                            <a href="/ProductionPlanQuangNds/Details?id=${plan.planId}" class="btn btn-outline-info" title="Details"><i class="bi bi-eye"></i></a>
+                            <a href="/ProductionPlanQuangNds/Delete?id=${plan.planId}" class="btn btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></a>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return trHtml;
+        }
+
+        // Helper: hiển thị empty state khi bảng trống
+        function showEmptyState() {
+            var tbody = document.getElementById('productionPlansTableBody');
+            if (tbody.querySelectorAll('tr[data-plan-id]').length === 0) {
+                tbody.innerHTML = '<tr><td colspan="13" class="text-center py-5"><i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i><p class="text-muted mt-2">No production plans found.</p></td></tr>';
+            }
+        }
+
+        // RECEIVER - Lắng nghe event delete từ server
+        connection.on("Receiver_DeleteProductionPlan", function (planId) {
+            console.log("Received delete event for plan ID: " + planId);
+
+            var row = document.querySelector('tr[data-plan-id="' + planId + '"]');
             if (row) {
-                row.classList.add('row-deleting');
-                setTimeout(() => {
-                    row.remove();
-                    
-                    const tbody = document.getElementById('productionPlansTableBody');
-                    if (tbody.children.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="13" class="text-center">No production plans found.</td></tr>';
-                    }
-                }, 300);
+                row.style.transition = 'opacity 0.3s ease-out';
+                row.style.opacity = '0';
+                setTimeout(function () { row.remove(); showEmptyState(); }, 300);
             }
         });
 
-        connection.start()
-            .then(() => {
-                console.log("SignalR Connected to Production Plan Hub");
-            })
-            .catch(err => {
-                console.error("SignalR Connection Error: ", err);
-                setTimeout(() => connection.start(), 5000);
-            });
+        // RECEIVER - Lắng nghe sự kiện tạo mới
+        connection.on("Receiver_CreateProductionPlan", function (item) {
+            console.log("New production plan created: ", item);
 
-        connection.onreconnecting((error) => {
-            console.log("SignalR Reconnecting...", error);
+            var tbody = document.getElementById('productionPlansTableBody');
+
+            // Xóa empty state nếu có
+            var emptyRow = tbody.querySelector('td[colspan]');
+            if (emptyRow) emptyRow.closest('tr').remove();
+
+            // Không thêm nếu đã tồn tại
+            if (tbody.querySelector('tr[data-plan-id="' + item.planId + '"]')) return;
+
+            var trHtml = createPlanRow(item);
+            tbody.insertAdjacentHTML('afterbegin', trHtml);
         });
 
-        connection.onreconnected((connectionId) => {
-            console.log("SignalR Reconnected. Connection ID: " + connectionId);
+        // RECEIVER - Lắng nghe sự kiện cập nhật
+        connection.on("Receiver_UpdateProductionPlan", function (item) {
+            console.log("Production plan updated: ", item);
+
+            // Reload trang để hiển thị dữ liệu mới nhất
+            location.reload();
         });
 
-        connection.onclose((error) => {
-            console.log("SignalR Connection Closed", error);
-            setTimeout(() => connection.start(), 5000);
+        // Lắng nghe error từ server
+        connection.on("Error", function (errorMessage) {
+            console.error("Error from server: " + errorMessage);
         });
+
+
     </script>
+
+    <script>
+        // Client-side filtering
+        function applyFilters() {
+            var status = document.getElementById('filterStatus').value.toLowerCase();
+            var fromDate = document.getElementById('filterFromDate').value;
+            var toDate = document.getElementById('filterToDate').value;
+            var search = document.getElementById('filterSearch').value.toLowerCase();
+            var rows = document.querySelectorAll('#productionPlansTableBody tr[data-plan-id]');
+
+            rows.forEach(function (row) {
+                var cells = row.querySelectorAll('td');
+                var rowStatus = (cells[3] ? cells[3].textContent : '').trim().toLowerCase();
+                var rowDate = (cells[0] ? cells[0].textContent : '').trim();
+                var rowText = row.textContent.toLowerCase();
+
+                var show = true;
+
+                if (status && rowStatus !== status) show = false;
+
+                if (fromDate && rowDate) {
+                    var d = new Date(rowDate);
+                    if (!isNaN(d) && d < new Date(fromDate)) show = false;
+                }
+                if (toDate && rowDate) {
+                    var d = new Date(rowDate);
+                    if (!isNaN(d) && d > new Date(toDate)) show = false;
+                }
+
+                if (search && !rowText.includes(search)) show = false;
+
+                row.style.display = show ? '' : 'none';
+            });
+        }
+
+        function clearFilters() {
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterFromDate').value = '';
+            document.getElementById('filterToDate').value = '';
+            document.getElementById('filterSearch').value = '';
+            document.querySelectorAll('#productionPlansTableBody tr[data-plan-id]').forEach(function (row) {
+                row.style.display = '';
+            });
+        }
+    </script>
+
+    <style>
+        .table thead th {
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: 0.75rem;
+        }
+
+        .table tbody td {
+            padding: 0.75rem;
+            vertical-align: middle;
+        }
+
+        .btn-group-sm > .btn {
+            padding: 0.3rem 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .badge {
+            padding: 0.35em 0.6em;
+            font-weight: 500;
+        }
+    </style>
 }
+

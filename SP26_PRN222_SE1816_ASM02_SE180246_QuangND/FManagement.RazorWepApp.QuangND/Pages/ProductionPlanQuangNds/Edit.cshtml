@@ -2,89 +2,203 @@
 @model FManagement.RazorWepApp.QuangND.Pages.ProductionPlanQuangNds.EditModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Production Plan";
 }
 
-<h1>Edit</h1>
-
-<h4>ProductionPlanQuangNd</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ProductionPlanQuangNd.PlanId" />
-            <div class="form-group">
-                <label asp-for="ProductionPlanQuangNd.StoreOrderItemId" class="control-label"></label>
-                <select asp-for="ProductionPlanQuangNd.StoreOrderItemId" class="form-control" asp-items="ViewBag.StoreOrderItemId" ></select>
-                <span asp-validation-for="ProductionPlanQuangNd.StoreOrderItemId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProductionPlanQuangNd.KitchenId" class="control-label"></label>
-                <select asp-for="ProductionPlanQuangNd.KitchenId" class="form-control" asp-items="ViewBag.KitchenId" ></select>
-                <span asp-validation-for="ProductionPlanQuangNd.KitchenId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProductionPlanQuangNd.PlanDate" class="control-label"></label>
-                <input asp-for="ProductionPlanQuangNd.PlanDate" class="form-control" />
-                <span asp-validation-for="ProductionPlanQuangNd.PlanDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProductionPlanQuangNd.StartTime" class="control-label"></label>
-                <input asp-for="ProductionPlanQuangNd.StartTime" class="form-control" />
-                <span asp-validation-for="ProductionPlanQuangNd.StartTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProductionPlanQuangNd.EndTime" class="control-label"></label>
-                <input asp-for="ProductionPlanQuangNd.EndTime" class="form-control" />
-                <span asp-validation-for="ProductionPlanQuangNd.EndTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProductionPlanQuangNd.PlanStatus" class="control-label"></label>
-                <input asp-for="ProductionPlanQuangNd.PlanStatus" class="form-control" />
-                <span asp-validation-for="ProductionPlanQuangNd.PlanStatus" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProductionPlanQuangNd.PriorityLevel" class="control-label"></label>
-                <input asp-for="ProductionPlanQuangNd.PriorityLevel" class="form-control" />
-                <span asp-validation-for="ProductionPlanQuangNd.PriorityLevel" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProductionPlanQuangNd.TotalExpectedQuantity" class="control-label"></label>
-                <input asp-for="ProductionPlanQuangNd.TotalExpectedQuantity" class="form-control" />
-                <span asp-validation-for="ProductionPlanQuangNd.TotalExpectedQuantity" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProductionPlanQuangNd.ActualProducedQuantity" class="control-label"></label>
-                <input asp-for="ProductionPlanQuangNd.ActualProducedQuantity" class="form-control" />
-                <span asp-validation-for="ProductionPlanQuangNd.ActualProducedQuantity" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProductionPlanQuangNd.BatchNotes" class="control-label"></label>
-                <input asp-for="ProductionPlanQuangNd.BatchNotes" class="form-control" />
-                <span asp-validation-for="ProductionPlanQuangNd.BatchNotes" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProductionPlanQuangNd.LastModifiedBy" class="control-label"></label>
-                <input asp-for="ProductionPlanQuangNd.LastModifiedBy" class="form-control" />
-                <span asp-validation-for="ProductionPlanQuangNd.LastModifiedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="ProductionPlanQuangNd.IsDeleted" /> @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.IsDeleted)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-1">
+                <i class="bi bi-pencil-square text-primary"></i> Edit Production Plan
+            </h2>
+            <p class="text-muted">Update the production plan details</p>
+        </div>
     </div>
-</div>
 
-<div>
-    <a asp-page="./Index">Back to List</a>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                <input type="hidden" asp-for="ProductionPlanQuangNd.PlanId" />
+                
+                <div class="row">
+                    <!-- Left Column -->
+                    <div class="col-md-6">
+                        <h5 class="text-primary mb-3"><i class="bi bi-info-circle"></i> Basic Information</h5>
+                        
+                        <div class="mb-3">
+                            <label asp-for="ProductionPlanQuangNd.StoreOrderItemId" class="form-label fw-semibold">
+                                <i class="bi bi-cart"></i> Store Order Item <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="ProductionPlanQuangNd.StoreOrderItemId" class="form-select" asp-items="ViewBag.StoreOrderItemId">
+                                <option value="">-- Select Order Item --</option>
+                            </select>
+                            <span asp-validation-for="ProductionPlanQuangNd.StoreOrderItemId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ProductionPlanQuangNd.KitchenId" class="form-label fw-semibold">
+                                <i class="bi bi-building"></i> Central Kitchen <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="ProductionPlanQuangNd.KitchenId" class="form-select" asp-items="ViewBag.KitchenId">
+                                <option value="">-- Select Kitchen --</option>
+                            </select>
+                            <span asp-validation-for="ProductionPlanQuangNd.KitchenId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ProductionPlanQuangNd.PlanDate" class="form-label fw-semibold">
+                                <i class="bi bi-calendar"></i> Plan Date <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="ProductionPlanQuangNd.PlanDate" type="date" class="form-control" />
+                            <span asp-validation-for="ProductionPlanQuangNd.PlanDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ProductionPlanQuangNd.StartTime" class="form-label fw-semibold">
+                                    <i class="bi bi-clock"></i> Start Time
+                                </label>
+                                <input asp-for="ProductionPlanQuangNd.StartTime" class="form-control" />
+                                <span asp-validation-for="ProductionPlanQuangNd.StartTime" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ProductionPlanQuangNd.EndTime" class="form-label fw-semibold">
+                                    <i class="bi bi-clock-fill"></i> End Time
+                                </label>
+                                <input asp-for="ProductionPlanQuangNd.EndTime" class="form-control" />
+                                <span asp-validation-for="ProductionPlanQuangNd.EndTime" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="col-md-6">
+                        <h5 class="text-primary mb-3"><i class="bi bi-gear"></i> Plan Details</h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ProductionPlanQuangNd.PlanStatus" class="form-label fw-semibold">
+                                    <i class="bi bi-flag"></i> Status
+                                </label>
+                                <select asp-for="ProductionPlanQuangNd.PlanStatus" class="form-select" asp-items="ViewBag.PlanStatusList">
+                                    <option value="">-- Select Status --</option>
+                                </select>
+                                <span asp-validation-for="ProductionPlanQuangNd.PlanStatus" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ProductionPlanQuangNd.PriorityLevel" class="form-label fw-semibold">
+                                    <i class="bi bi-exclamation-triangle"></i> Priority
+                                </label>
+                                <select asp-for="ProductionPlanQuangNd.PriorityLevel" class="form-select" asp-items="ViewBag.PriorityLevelList">
+                                    <option value="">-- Select Priority --</option>
+                                </select>
+                                <span asp-validation-for="ProductionPlanQuangNd.PriorityLevel" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ProductionPlanQuangNd.TotalExpectedQuantity" class="form-label fw-semibold">
+                                    <i class="bi bi-box"></i> Expected Quantity
+                                </label>
+                                <input asp-for="ProductionPlanQuangNd.TotalExpectedQuantity" class="form-control" />
+                                <span asp-validation-for="ProductionPlanQuangNd.TotalExpectedQuantity" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ProductionPlanQuangNd.ActualProducedQuantity" class="form-label fw-semibold">
+                                    <i class="bi bi-box-seam"></i> Produced Quantity
+                                </label>
+                                <input asp-for="ProductionPlanQuangNd.ActualProducedQuantity" class="form-control" />
+                                <span asp-validation-for="ProductionPlanQuangNd.ActualProducedQuantity" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ProductionPlanQuangNd.BatchNotes" class="form-label fw-semibold">
+                                <i class="bi bi-sticky"></i> Batch Notes
+                            </label>
+                            <textarea asp-for="ProductionPlanQuangNd.BatchNotes" class="form-control" rows="3" placeholder="Enter any notes..."></textarea>
+                            <span asp-validation-for="ProductionPlanQuangNd.BatchNotes" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ProductionPlanQuangNd.LastModifiedBy" class="form-label fw-semibold">
+                                <i class="bi bi-person"></i> Last Modified By
+                            </label>
+                            <input asp-for="ProductionPlanQuangNd.LastModifiedBy" class="form-control" />
+                            <span asp-validation-for="ProductionPlanQuangNd.LastModifiedBy" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input class="form-check-input" asp-for="ProductionPlanQuangNd.IsDeleted" />
+                            <label class="form-check-label" asp-for="ProductionPlanQuangNd.IsDeleted">
+                                <i class="bi bi-trash"></i> Mark as Deleted
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="d-flex justify-content-between">
+                    <a asp-page="./Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                    <button type="button" id="btnHubUpdate" class="btn btn-success btn-lg">
+                        <i class="bi bi-check-circle"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+    <script>
+        "use strict";
+
+        var connection = new signalR.HubConnectionBuilder().withUrl("/productionPlanHub").build();
+
+        connection.start().then(function () {
+            console.log("QuangND: Connected to the SignalR Hub");
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        connection.on("Error", function (errorMessage) {
+            console.error("Error: " + errorMessage);
+        });
+
+        document.getElementById("btnHubUpdate").addEventListener("click", function (event) {
+            event.preventDefault();
+
+            var dataObj = JSON.stringify({
+                PlanId: parseInt(document.getElementById("ProductionPlanQuangNd_PlanId").value),
+                StoreOrderItemId: parseInt(document.getElementById("ProductionPlanQuangNd_StoreOrderItemId").value),
+                KitchenId: parseInt(document.getElementById("ProductionPlanQuangNd_KitchenId").value),
+                PlanDate: document.getElementById("ProductionPlanQuangNd_PlanDate").value,
+                StartTime: document.getElementById("ProductionPlanQuangNd_StartTime").value || null,
+                EndTime: document.getElementById("ProductionPlanQuangNd_EndTime").value || null,
+                PlanStatus: document.getElementById("ProductionPlanQuangNd_PlanStatus").value,
+                PriorityLevel: parseInt(document.getElementById("ProductionPlanQuangNd_PriorityLevel").value) || null,
+                TotalExpectedQuantity: parseInt(document.getElementById("ProductionPlanQuangNd_TotalExpectedQuantity").value) || null,
+                ActualProducedQuantity: parseInt(document.getElementById("ProductionPlanQuangNd_ActualProducedQuantity").value) || null,
+                BatchNotes: document.getElementById("ProductionPlanQuangNd_BatchNotes").value,
+                LastModifiedBy: parseInt(document.getElementById("ProductionPlanQuangNd_LastModifiedBy").value) || null,
+                IsDeleted: document.getElementById("ProductionPlanQuangNd_IsDeleted").checked
+            });
+
+            connection.invoke("HubUpdate_ProductionPlanQuangNd", dataObj)
+                .then(function () {
+                    window.location.href = "/ProductionPlanQuangNds/Index";
+                })
+                .catch(function (err) {
+                    return console.error(err.toString());
+                });
+        });
+    </script>
 }

@@ -2,93 +2,152 @@
 @model FManagement.RazorWepApp.QuangND.Pages.ProductionPlanQuangNds.DeleteModel
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Delete Production Plan";
 }
 
-<h1>Delete</h1>
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-1">
+                <i class="bi bi-exclamation-triangle text-danger"></i> Delete Production Plan
+            </h2>
+            <p class="text-muted">Review the details below before confirming deletion</p>
+        </div>
+    </div>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>ProductionPlanQuangNd</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.PlanDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.PlanDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.StartTime)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.StartTime)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.EndTime)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.EndTime)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.PlanStatus)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.PlanStatus)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.PriorityLevel)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.PriorityLevel)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.TotalExpectedQuantity)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.TotalExpectedQuantity)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.ActualProducedQuantity)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.ActualProducedQuantity)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.BatchNotes)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.BatchNotes)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.LastModifiedBy)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.LastModifiedBy)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.IsDeleted)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.IsDeleted)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.Kitchen)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.Kitchen.KitchenName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionPlanQuangNd.StoreOrderItem)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ProductionPlanQuangNd.StoreOrderItem.OrderItemId)
-        </dd>
-    </dl>
-    
-    <form method="post">
-        <input type="hidden" asp-for="ProductionPlanQuangNd.PlanId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-page="./Index">Back to List</a>
-    </form>
+    <div class="card shadow-sm border-danger">
+        <div class="card-header bg-danger bg-opacity-10 text-danger fw-semibold">
+            <i class="bi bi-exclamation-triangle"></i> Are you sure you want to delete this production plan?
+        </div>
+        <div class="card-body">
+            @Html.HiddenFor(model => model.ProductionPlanQuangNd.PlanId)
+            <div class="row" id="DeletePlanDetails">
+                <!-- Left Column -->
+                <div class="col-md-6">
+                    <h5 class="text-primary mb-3"><i class="bi bi-info-circle"></i> Basic Information</h5>
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th class="text-muted" style="width:40%"><i class="bi bi-calendar3"></i> Plan Date</th>
+                                <td id="Delete_PlanDate">@Html.DisplayFor(model => model.ProductionPlanQuangNd.PlanDate)</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-clock"></i> Start Time</th>
+                                <td id="Delete_StartTime">@Html.DisplayFor(model => model.ProductionPlanQuangNd.StartTime)</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-clock-fill"></i> End Time</th>
+                                <td id="Delete_EndTime">@Html.DisplayFor(model => model.ProductionPlanQuangNd.EndTime)</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-flag"></i> Status</th>
+                                <td id="Delete_PlanStatus">@Html.DisplayFor(model => model.ProductionPlanQuangNd.PlanStatus)</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-exclamation-triangle"></i> Priority</th>
+                                <td id="Delete_PriorityLevel">@Html.DisplayFor(model => model.ProductionPlanQuangNd.PriorityLevel)</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-building"></i> Kitchen</th>
+                                <td id="Delete_KitchenName">@Html.DisplayFor(model => model.ProductionPlanQuangNd.Kitchen.KitchenName)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Right Column -->
+                <div class="col-md-6">
+                    <h5 class="text-primary mb-3"><i class="bi bi-gear"></i> Production Details</h5>
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th class="text-muted" style="width:40%"><i class="bi bi-box"></i> Expected Qty</th>
+                                <td id="Delete_TotalExpectedQuantity"><strong class="text-primary">@Html.DisplayFor(model => model.ProductionPlanQuangNd.TotalExpectedQuantity)</strong></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-box-seam"></i> Actual Qty</th>
+                                <td id="Delete_ActualProducedQuantity"><strong class="text-success">@Html.DisplayFor(model => model.ProductionPlanQuangNd.ActualProducedQuantity)</strong></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-cart"></i> Order Item</th>
+                                <td id="Delete_StoreOrderItemId">@Html.DisplayFor(model => model.ProductionPlanQuangNd.StoreOrderItem.OrderItemId)</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-sticky"></i> Notes</th>
+                                <td id="Delete_BatchNotes">@Html.DisplayFor(model => model.ProductionPlanQuangNd.BatchNotes)</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-person"></i> Modified By</th>
+                                <td id="Delete_LastModifiedBy">@Html.DisplayFor(model => model.ProductionPlanQuangNd.LastModifiedBy)</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted"><i class="bi bi-trash"></i> Deleted</th>
+                                <td id="Delete_IsDeleted">@Html.DisplayFor(model => model.ProductionPlanQuangNd.IsDeleted)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <hr class="my-3" />
+
+            <div class="d-flex justify-content-between">
+                <a asp-page="./Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to List
+                </a>
+                <button type="button" id="btnDeleteSignalR" class="btn btn-danger btn-lg">
+                    <i class="bi bi-trash"></i> Confirm Delete
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+    <script>
+        "use strict";
+
+        var connection = new signalR.HubConnectionBuilder().withUrl("/productionPlanHub").build();
+
+        connection.start().then(function () {
+            console.log("QuangND: Connected to the SignalR Hub");
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        // RECEIVER - Lắng nghe sự kiện cập nhật (khi ai đó sửa plan trên tab khác)
+        connection.on("Receiver_UpdateProductionPlan", function (item) {
+            var currentPlanId = document.getElementById("ProductionPlanQuangNd_PlanId").value;
+
+            if (currentPlanId == item.planId) {
+                document.getElementById("Delete_PlanDate").innerHTML = item.planDate || '';
+                document.getElementById("Delete_StartTime").innerHTML = item.startTime ? new Date(item.startTime).toLocaleString() : '';
+                document.getElementById("Delete_EndTime").innerHTML = item.endTime ? new Date(item.endTime).toLocaleString() : '';
+                document.getElementById("Delete_PlanStatus").innerHTML = item.planStatus || '';
+                document.getElementById("Delete_PriorityLevel").innerHTML = item.priorityLevel || '';
+                document.getElementById("Delete_KitchenName").innerHTML = item.kitchen?.kitchenName || '';
+                document.getElementById("Delete_TotalExpectedQuantity").innerHTML = item.totalExpectedQuantity || '';
+                document.getElementById("Delete_ActualProducedQuantity").innerHTML = item.actualProducedQuantity || '';
+                document.getElementById("Delete_StoreOrderItemId").innerHTML = item.storeOrderItemId || '';
+                document.getElementById("Delete_BatchNotes").innerHTML = item.batchNotes || '';
+                document.getElementById("Delete_LastModifiedBy").innerHTML = item.lastModifiedBy || '';
+                document.getElementById("Delete_IsDeleted").innerHTML = item.isDeleted;
+            }
+        });
+
+        // SENDER - Xử lý click nút Confirm Delete
+        document.getElementById("btnDeleteSignalR").addEventListener("click", function () {
+            var planId = @Model.ProductionPlanQuangNd.PlanId;
+
+            connection.invoke("HubDelete_ProductionPlanQuangNd", planId)
+                .then(function () {
+                    window.location.href = "/ProductionPlanQuangNds/Index";
+                })
+                .catch(function (err) {
+                    return console.error(err.toString());
+                });
+        });
+    </script>
+}
+
