@@ -10,9 +10,9 @@ internal class Program
         builder.Services.AddHostedService<Worker>();
         builder.Services.AddWindowsService(options =>
         {
-            options.ServiceName = "FManagement.WorkerService.QuangND";
+            options.ServiceName = "QuangND_SE1816";
         });
-        builder.Services.AddScoped<IProductPlanQuangNDService, ProductPlanQuangNDService>();
+        builder.Services.AddSingleton<IProductPlanQuangNDService, ProductPlanQuangNDService>();
         var host = builder.Build();
         host.Run();
     }
