@@ -211,6 +211,10 @@
         var $numBlockSize = $('.table-pagination-pagination-num-' + $tableId).eq(-1).outerWidth();
         var $avaliableBlock = Math.floor($availableSpace / $numBlockSize);
 
+        if (isNaN($avaliableBlock) || !isFinite($avaliableBlock) || $avaliableBlock < 5) {
+            $avaliableBlock = 5;
+        }
+
         $pageStart = 1;
         if ($avaliableBlock < $totalPage) {
             $pageEnd = $avaliableBlock;
