@@ -36,6 +36,7 @@ namespace FManagement.MVCWebApp.QuangND.Controllers
                 {
                     var claims = new List<Claim>
                                 {
+                                    new Claim(ClaimTypes.NameIdentifier, userAccount.UserAccountId.ToString()),
                                     new Claim(ClaimTypes.Name, userAccount.UserName),
                                     new Claim(ClaimTypes.Role, userAccount.RoleId.ToString())
                                 };

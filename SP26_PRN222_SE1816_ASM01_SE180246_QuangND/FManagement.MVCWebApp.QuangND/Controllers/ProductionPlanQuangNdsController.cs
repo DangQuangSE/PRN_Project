@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using FManagement.Entities.QuangND.Entities;
 using FManagement.Services.QuangND;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace FManagement.MVCWebApp.QuangND.Controllers
 {
@@ -139,6 +140,12 @@ namespace FManagement.MVCWebApp.QuangND.Controllers
             {
                 try
                 {
+                    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    if (int.TryParse(userIdClaim, out int userId))
+                    {
+                        productionPlanQuangNd.LastModifiedBy = userId;
+                    }
+
                     var result = await _productPlanQuangNDService.UpdateAsync(productionPlanQuangNd);
                     if (result > 0)
                     {
