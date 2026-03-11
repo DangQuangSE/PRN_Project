@@ -1,0 +1,68 @@
+﻿@page "/productionplanquangnds/details"
+@using Microsoft.EntityFrameworkCore
+@using FManagement.Entities.QuangND.Entities
+@inject IDbContextFactory<FManagement.Entities.QuangND.Entities.FranchiseManagementContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>ProductionPlanQuangNd</h2>
+    <hr />
+    @if (productionplanquangnd is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">StoreOrderItemId</dt>
+            <dd class="col-sm-10">@productionplanquangnd.StoreOrderItemId</dd>
+            <dt class="col-sm-2">KitchenId</dt>
+            <dd class="col-sm-10">@productionplanquangnd.KitchenId</dd>
+            <dt class="col-sm-2">PlanDate</dt>
+            <dd class="col-sm-10">@productionplanquangnd.PlanDate</dd>
+            <dt class="col-sm-2">StartTime</dt>
+            <dd class="col-sm-10">@productionplanquangnd.StartTime</dd>
+            <dt class="col-sm-2">EndTime</dt>
+            <dd class="col-sm-10">@productionplanquangnd.EndTime</dd>
+            <dt class="col-sm-2">PlanStatus</dt>
+            <dd class="col-sm-10">@productionplanquangnd.PlanStatus</dd>
+            <dt class="col-sm-2">PriorityLevel</dt>
+            <dd class="col-sm-10">@productionplanquangnd.PriorityLevel</dd>
+            <dt class="col-sm-2">TotalExpectedQuantity</dt>
+            <dd class="col-sm-10">@productionplanquangnd.TotalExpectedQuantity</dd>
+            <dt class="col-sm-2">ActualProducedQuantity</dt>
+            <dd class="col-sm-10">@productionplanquangnd.ActualProducedQuantity</dd>
+            <dt class="col-sm-2">BatchNotes</dt>
+            <dd class="col-sm-10">@productionplanquangnd.BatchNotes</dd>
+            <dt class="col-sm-2">LastModifiedBy</dt>
+            <dd class="col-sm-10">@productionplanquangnd.LastModifiedBy</dd>
+            <dt class="col-sm-2">IsDeleted</dt>
+            <dd class="col-sm-10">@productionplanquangnd.IsDeleted</dd>
+        </dl>
+        <div>
+            <a href="@($"/productionplanquangnds/edit?planid={productionplanquangnd.PlanId}")">Edit</a> |
+            <a href="@($"/productionplanquangnds")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private ProductionPlanQuangNd? productionplanquangnd;
+
+    [SupplyParameterFromQuery]
+    private int PlanId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        productionplanquangnd = await context.ProductionPlanQuangNds.FirstOrDefaultAsync(m => m.PlanId == PlanId);
+
+        if (productionplanquangnd is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

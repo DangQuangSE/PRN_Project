@@ -1,0 +1,99 @@
+﻿@page "/productionplanquangnds/delete"
+@using Microsoft.EntityFrameworkCore
+@using FManagement.Entities.QuangND.Entities
+@inject IDbContextFactory<FManagement.Entities.QuangND.Entities.FranchiseManagementContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>ProductionPlanQuangNd</h2>
+    <hr />
+    @if (productionplanquangnd is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">StoreOrderItemId</dt>
+            <dd class="col-sm-10">@productionplanquangnd.StoreOrderItemId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">KitchenId</dt>
+            <dd class="col-sm-10">@productionplanquangnd.KitchenId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">PlanDate</dt>
+            <dd class="col-sm-10">@productionplanquangnd.PlanDate</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">StartTime</dt>
+            <dd class="col-sm-10">@productionplanquangnd.StartTime</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">EndTime</dt>
+            <dd class="col-sm-10">@productionplanquangnd.EndTime</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">PlanStatus</dt>
+            <dd class="col-sm-10">@productionplanquangnd.PlanStatus</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">PriorityLevel</dt>
+            <dd class="col-sm-10">@productionplanquangnd.PriorityLevel</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">TotalExpectedQuantity</dt>
+            <dd class="col-sm-10">@productionplanquangnd.TotalExpectedQuantity</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">ActualProducedQuantity</dt>
+            <dd class="col-sm-10">@productionplanquangnd.ActualProducedQuantity</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">BatchNotes</dt>
+            <dd class="col-sm-10">@productionplanquangnd.BatchNotes</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">LastModifiedBy</dt>
+            <dd class="col-sm-10">@productionplanquangnd.LastModifiedBy</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">IsDeleted</dt>
+            <dd class="col-sm-10">@productionplanquangnd.IsDeleted</dd>
+        </dl>
+        <EditForm method="post" Model="productionplanquangnd" OnValidSubmit="DeleteProductionPlanQuangNd" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(productionplanquangnd is null)">Delete</button> |
+            <a href="/productionplanquangnds">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private ProductionPlanQuangNd? productionplanquangnd;
+
+    [SupplyParameterFromQuery]
+    private int PlanId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        productionplanquangnd = await context.ProductionPlanQuangNds.FirstOrDefaultAsync(m => m.PlanId == PlanId);
+
+        if (productionplanquangnd is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteProductionPlanQuangNd()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.ProductionPlanQuangNds.Remove(productionplanquangnd!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/productionplanquangnds");
+    }
+}

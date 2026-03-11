@@ -1,0 +1,134 @@
+﻿@page "/productionplanquangnds/create"
+@using FManagement.Services.QuangND
+@using Microsoft.EntityFrameworkCore
+@using FManagement.Entities.QuangND.Entities
+@inject IProductPlanQuangNDService _productPlanQuangNDService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>ProductionPlanQuangNd</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="ProductionPlanQuangNd" OnValidSubmit="AddProductionPlanQuangNd" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="storeorderitemid" class="form-label">StoreOrderItemId:</label> 
+                <InputNumber id="storeorderitemid" @bind-Value="ProductionPlanQuangNd.StoreOrderItemId" class="form-control" /> 
+                <ValidationMessage For="() => ProductionPlanQuangNd.StoreOrderItemId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="kitchenid" class="form-label">KitchenId:</label> 
+                <InputNumber id="kitchenid" @bind-Value="ProductionPlanQuangNd.KitchenId" class="form-control" /> 
+                <ValidationMessage For="() => ProductionPlanQuangNd.KitchenId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="plandate" class="form-label">PlanDate:</label> 
+                <InputDate id="plandate" @bind-Value="ProductionPlanQuangNd.PlanDate" class="form-control" /> 
+                <ValidationMessage For="() => ProductionPlanQuangNd.PlanDate" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="starttime" class="form-label">StartTime:</label> 
+                <InputDate id="starttime" @bind-Value="ProductionPlanQuangNd.StartTime" class="form-control" /> 
+                <ValidationMessage For="() => ProductionPlanQuangNd.StartTime" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="endtime" class="form-label">EndTime:</label> 
+                <InputDate id="endtime" @bind-Value="ProductionPlanQuangNd.EndTime" class="form-control" /> 
+                <ValidationMessage For="() => ProductionPlanQuangNd.EndTime" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="planstatus" class="form-label">PlanStatus:</label> 
+                <InputText id="planstatus" @bind-Value="ProductionPlanQuangNd.PlanStatus" class="form-control" /> 
+                <ValidationMessage For="() => ProductionPlanQuangNd.PlanStatus" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="prioritylevel" class="form-label">PriorityLevel:</label> 
+                <InputNumber id="prioritylevel" @bind-Value="ProductionPlanQuangNd.PriorityLevel" class="form-control" /> 
+                <ValidationMessage For="() => ProductionPlanQuangNd.PriorityLevel" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="totalexpectedquantity" class="form-label">TotalExpectedQuantity:</label> 
+                <InputNumber id="totalexpectedquantity" @bind-Value="ProductionPlanQuangNd.TotalExpectedQuantity" class="form-control" /> 
+                <ValidationMessage For="() => ProductionPlanQuangNd.TotalExpectedQuantity" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="actualproducedquantity" class="form-label">ActualProducedQuantity:</label> 
+                <InputNumber id="actualproducedquantity" @bind-Value="ProductionPlanQuangNd.ActualProducedQuantity" class="form-control" /> 
+                <ValidationMessage For="() => ProductionPlanQuangNd.ActualProducedQuantity" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="batchnotes" class="form-label">BatchNotes:</label> 
+                <InputText id="batchnotes" @bind-Value="ProductionPlanQuangNd.BatchNotes" class="form-control" /> 
+                <ValidationMessage For="() => ProductionPlanQuangNd.BatchNotes" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="lastmodifiedby" class="form-label">LastModifiedBy:</label> 
+                <InputNumber id="lastmodifiedby" @bind-Value="ProductionPlanQuangNd.LastModifiedBy" class="form-control" /> 
+                <ValidationMessage For="() => ProductionPlanQuangNd.LastModifiedBy" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="isdeleted" class="form-label">IsDeleted:</label> 
+                <InputCheckbox id="isdeleted" @bind-Value="ProductionPlanQuangNd.IsDeleted" class="form-check-input" /> 
+                <ValidationMessage For="() => ProductionPlanQuangNd.IsDeleted" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/productionplanquangnds">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private ProductionPlanQuangNd ProductionPlanQuangNd { get; set; } = new();
+    private async Task OnInitializedAsync()
+    {
+        if(ProductionPlanQuangNd == null)
+        {
+            ProductonPlanQuangNd = new ProductionPlanQuangNd(
+                 StoreOrderItemId = 1, // ID mặc định (hoặc lấy từ query string nêú có)
+                KitchenId = 1,        // ID bếp mặc định (thường user sẽ chọn trên UI)
+                PlanDate = DateOnly.FromDateTime(DateTime.Now), // Mặc định là ngày hôm nay
+                StartTime = DateTime.Now,                       // Mặc định là giờ hiện tại
+                EndTime = DateTime.Now.AddHours(2),             // Mặc định kết thúc sau 2 tiếng
+                PlanStatus = "Pending",                         // Trạng thái mặc định ban đầu là Pending
+                PriorityLevel = 1,                              // Mức ưu tiên thấp nhất
+                TotalExpectedQuantity = 0,                      // Số lượng dự kiến
+                ActualProducedQuantity = 0,                     // Số lượng thực tế đã sản xuất
+                BatchNotes = "",                                // Ghi chú trống
+                IsDeleted = false
+            );
+        }    
+    }
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    // private async Task AddProductionPlanQuangNd()
+    // {
+    //     using var context = DbFactory.CreateDbContext();
+    //     context.ProductionPlanQuangNds.Add(ProductionPlanQuangNd);
+    //     await context.SaveChangesAsync();
+    //     NavigationManager.NavigateTo("/productionplanquangnds");
+    // }
+    private async Task AddProductionPlanQuangNd()
+    {
+        try
+        {
+            var result = await _productPlanQuangNDService.CreateAsync(ProductionPlanQuangNd);
+            if(result > 0)
+            {
+                NavigationManager.NavigateTo("/productionplanquangnds");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Error adding ProductionPlanQuangNd: " + ex.Message);
+        }
+    }
+}

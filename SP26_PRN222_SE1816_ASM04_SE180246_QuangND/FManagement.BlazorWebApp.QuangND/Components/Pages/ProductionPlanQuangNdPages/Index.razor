@@ -1,0 +1,54 @@
+﻿@page "/productionplanquangnds"
+@using FManagement.Services.QuangND
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using FManagement.Entities.QuangND.Entities
+@inject IProductPlanQuangNDService _productPlanQuangNDService
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="productionplanquangnds/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="ProductionPlanQuangNds">
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.StoreOrderItemId" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.KitchenId" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.PlanDate" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.StartTime" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.EndTime" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.PlanStatus" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.PriorityLevel" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.TotalExpectedQuantity" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.ActualProducedQuantity" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.BatchNotes" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.LastModifiedBy" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.IsDeleted" />
+
+    <TemplateColumn Context="productionplanquangnd">
+        <a href="@($"productionplanquangnds/edit?planid={productionplanquangnd.PlanId}")">Edit</a> |
+        <a href="@($"productionplanquangnds/details?planid={productionplanquangnd.PlanId}")">Details</a> |
+        <a href="@($"productionplanquangnds/delete?planid={productionplanquangnd.PlanId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    //private FranchiseStoreContext context = default!;
+    private IQueryable<ProductionPlanQuangNd> ProductionPlanQuangNds = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // context = DbFactory.CreateDbContext();
+        try
+        {
+            ProductionPlanQuangNds = (await _productPlanQuangNDService.GetAllAsync()).AsQueryable();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error loading data: " + ex.Message);
+        }
+    }
+
+    // public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}
