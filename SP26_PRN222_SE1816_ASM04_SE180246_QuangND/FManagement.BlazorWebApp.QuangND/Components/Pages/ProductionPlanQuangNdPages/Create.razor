@@ -1,4 +1,4 @@
-﻿@page "/productionplanquangnds/create"
+@page "/productionplanquangnds/create"
 @using FManagement.Services.QuangND
 @using Microsoft.EntityFrameworkCore
 @using FManagement.Entities.QuangND.Entities
@@ -17,13 +17,25 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
-                <label for="storeorderitemid" class="form-label">StoreOrderItemId:</label> 
-                <InputNumber id="storeorderitemid" @bind-Value="ProductionPlanQuangNd.StoreOrderItemId" class="form-control" /> 
+                <label for="storeorderitemid" class="form-label">StoreOrderItem:</label> 
+                <InputSelect id="storeorderitemid" @bind-Value="ProductionPlanQuangNd.StoreOrderItemId" class="form-select">
+                    <option value="0">-- Select Order Item --</option>
+                    @foreach (var item in StoreOrderItems)
+                    {
+                        <option value="@item.OrderItemId">#@item.OrderItemId - @(item.Product?.ProductName ?? "N/A") (Qty: @item.QuantityOrdered)</option>
+                    }
+                </InputSelect>
                 <ValidationMessage For="() => ProductionPlanQuangNd.StoreOrderItemId" class="text-danger" /> 
             </div>        
             <div class="mb-3">
-                <label for="kitchenid" class="form-label">KitchenId:</label> 
-                <InputNumber id="kitchenid" @bind-Value="ProductionPlanQuangNd.KitchenId" class="form-control" /> 
+                <label for="kitchenid" class="form-label">Kitchen:</label> 
+                <InputSelect id="kitchenid" @bind-Value="ProductionPlanQuangNd.KitchenId" class="form-select">
+                    <option value="0">-- Select Kitchen --</option>
+                    @foreach (var kitchen in Kitchens)
+                    {
+                        <option value="@kitchen.KitchenId">@kitchen.KitchenName</option>
+                    }
+                </InputSelect>
                 <ValidationMessage For="() => ProductionPlanQuangNd.KitchenId" class="text-danger" /> 
             </div>        
             <div class="mb-3">
@@ -43,12 +55,21 @@
             </div>        
             <div class="mb-3">
                 <label for="planstatus" class="form-label">PlanStatus:</label> 
-                <InputText id="planstatus" @bind-Value="ProductionPlanQuangNd.PlanStatus" class="form-control" /> 
+                <InputSelect id="planstatus" @bind-Value="ProductionPlanQuangNd.PlanStatus" class="form-select">
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                </InputSelect>
                 <ValidationMessage For="() => ProductionPlanQuangNd.PlanStatus" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="prioritylevel" class="form-label">PriorityLevel:</label> 
-                <InputNumber id="prioritylevel" @bind-Value="ProductionPlanQuangNd.PriorityLevel" class="form-control" /> 
+                <InputSelect @bind-Value="ProductionPlanQuangNd.PriorityLevel" class="form-select" id="prioritylevel">
+                    <option value="0">Low</option>
+                    <option value="1">Medium</option>
+                    <option value="2">High</option>
+                </InputSelect>
                 <ValidationMessage For="() => ProductionPlanQuangNd.PriorityLevel" class="text-danger" /> 
             </div>        
             <div class="mb-3">
@@ -88,23 +109,32 @@
 @code {
     [SupplyParameterFromForm]
     private ProductionPlanQuangNd ProductionPlanQuangNd { get; set; } = new();
-    private async Task OnInitializedAsync()
+
+    private List<CentralKitchen> Kitchens { get; set; } = new();
+    private List<StoreOrderItemQuangNd> StoreOrderItems { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
     {
-        if(ProductionPlanQuangNd == null)
+        using var context = new FranchiseManagementContext();
+        Kitchens = await context.CentralKitchens.ToListAsync();
+        StoreOrderItems = await context.StoreOrderItemQuangNds.Include(x => x.Product).ToListAsync();
+
+        if (ProductionPlanQuangNd.StoreOrderItemId == 0 && ProductionPlanQuangNd.KitchenId == 0)
         {
-            ProductonPlanQuangNd = new ProductionPlanQuangNd(
-                 StoreOrderItemId = 1, // ID mặc định (hoặc lấy từ query string nêú có)
-                KitchenId = 1,        // ID bếp mặc định (thường user sẽ chọn trên UI)
-                PlanDate = DateOnly.FromDateTime(DateTime.Now), // Mặc định là ngày hôm nay
-                StartTime = DateTime.Now,                       // Mặc định là giờ hiện tại
-                EndTime = DateTime.Now.AddHours(2),             // Mặc định kết thúc sau 2 tiếng
-                PlanStatus = "Pending",                         // Trạng thái mặc định ban đầu là Pending
-                PriorityLevel = 1,                              // Mức ưu tiên thấp nhất
-                TotalExpectedQuantity = 0,                      // Số lượng dự kiến
-                ActualProducedQuantity = 0,                     // Số lượng thực tế đã sản xuất
-                BatchNotes = "",                                // Ghi chú trống
+            ProductionPlanQuangNd = new ProductionPlanQuangNd
+            {
+                StoreOrderItemId = 0,
+                KitchenId = 0,
+                PlanDate = DateOnly.FromDateTime(DateTime.Now),
+                StartTime = DateTime.Now,
+                EndTime = DateTime.Now.AddHours(2),
+                PlanStatus = "Pending",
+                PriorityLevel = 1,
+                TotalExpectedQuantity = 0,
+                ActualProducedQuantity = 0,
+                BatchNotes = "",
                 IsDeleted = false
-            );
+            };
         }    
     }
 
@@ -121,14 +151,24 @@
         try
         {
             var result = await _productPlanQuangNDService.CreateAsync(ProductionPlanQuangNd);
+
             if(result > 0)
             {
                 NavigationManager.NavigateTo("/productionplanquangnds");
             }
         }
+        catch (NavigationException)
+        {
+            // Allow Blazor to handle the navigation exception normally
+            throw;
+        }
         catch (Exception ex)
         {
             Console.Error.WriteLine("Error adding ProductionPlanQuangNd: " + ex.Message);
+            if (ex.InnerException != null) 
+            {
+                Console.Error.WriteLine("Inner exception: " + ex.InnerException.Message);
+            }
         }
     }
 }
