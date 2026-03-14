@@ -105,7 +105,19 @@
                             <td>@Html.DisplayFor(modelItem => item.StartTime)</td>
                             <td>@Html.DisplayFor(modelItem => item.EndTime)</td>
                             <td>@Html.DisplayFor(modelItem => item.PlanStatus)</td>
-                            <td class="text-center">@Html.DisplayFor(modelItem => item.PriorityLevel)</td>
+                            <td class="text-center">
+                                @{
+                                    var priorityValue = item.PriorityLevel ?? 0;
+                                    var priorityText = priorityValue switch
+                                    {
+                                        2 => "High",
+                                        1 => "Medium",
+                                        0 => "Low",
+                                        _ => "N/A"
+                                    };
+                                }
+                                @priorityText
+                            </td>
                             <td class="text-center">
                                 <strong class="text-primary">@Html.DisplayFor(modelItem => item.TotalExpectedQuantity)</strong>
                             </td>
@@ -179,13 +191,16 @@
         });
 
         function createPlanRow(plan) {
+            var priorityValue = parseInt(plan.priorityLevel) || 0;
+            var priorityText = priorityValue === 2 ? "High" : (priorityValue === 1 ? "Medium" : (priorityValue === 0 ? "Low" : "N/A"));
+
             var trHtml = `
                 <tr data-plan-id="${plan.planId}">
                     <td><i class="bi bi-calendar3 text-muted"></i> ${plan.planDate ?? ''}</td>
                     <td>${plan.startTime ? new Date(plan.startTime).toLocaleString() : ''}</td>
                     <td>${plan.endTime ? new Date(plan.endTime).toLocaleString() : ''}</td>
                     <td>${plan.planStatus ?? ''}</td>
-                    <td class="text-center">${plan.priorityLevel ?? ''}</td>
+                    <td class="text-center">${priorityText}</td>
                     <td class="text-center"><strong class="text-primary">${plan.totalExpectedQuantity ?? ''}</strong></td>
                     <td class="text-center"><strong class="text-success">${plan.actualProducedQuantity ?? ''}</strong></td>
                     <td><small class="text-muted">${plan.batchNotes ?? ''}</small></td>
