@@ -18,6 +18,12 @@ namespace FManagement.RazorWepApp.QuangND.Hubs
         {
             var productionPlan = JsonSerializer.Deserialize<ProductionPlanQuangNd>(dataJson);
 
+            var userIdClaim = Context.User?.FindFirst("UserId");
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            {
+                productionPlan.LastModifiedBy = userId;
+            }
+
             var result = await _productPlanQuangNDService.CreateAsync(productionPlan);
 
             await Clients.All.SendAsync("Receiver_CreateProductionPlan", productionPlan);
@@ -25,7 +31,17 @@ namespace FManagement.RazorWepApp.QuangND.Hubs
 
         public async Task HubDelete_ProductionPlanQuangNd(int planId)
         {
-            var result = await _productPlanQuangNDService.DeleteAsync(planId);
+            var planToSoftDelete = await _productPlanQuangNDService.GetByIdAysnc(planId);
+            if (planToSoftDelete != null)
+            {
+                planToSoftDelete.IsDeleted = true;
+                var userIdClaim = Context.User?.FindFirst("UserId");
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+                {
+                    planToSoftDelete.LastModifiedBy = userId;
+                }
+                var updateResult = await _productPlanQuangNDService.UpdateAsync(planToSoftDelete);
+            }
 
             await Clients.All.SendAsync("Receiver_DeleteProductionPlan", planId);
         }
@@ -33,6 +49,12 @@ namespace FManagement.RazorWepApp.QuangND.Hubs
         public async Task HubUpdate_ProductionPlanQuangNd(string dataJson)
         {
             var productionPlan = JsonSerializer.Deserialize<ProductionPlanQuangNd>(dataJson);
+
+            var userIdClaim = Context.User?.FindFirst("UserId");
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            {
+                productionPlan.LastModifiedBy = userId;
+            }
 
             var result = await _productPlanQuangNDService.UpdateAsync(productionPlan);
 

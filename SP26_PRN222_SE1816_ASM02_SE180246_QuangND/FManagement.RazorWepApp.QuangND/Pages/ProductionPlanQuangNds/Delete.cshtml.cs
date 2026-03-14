@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -49,10 +49,22 @@ namespace FManagement.RazorWepApp.QuangND.Pages.ProductionPlanQuangNds
                 return NotFound();
             }
 
-            var result = await _productPlanQuangNDService.DeleteAsync(id.Value);
-            if (result)
+            var planToSoftDelete = await _productPlanQuangNDService.GetByIdAysnc(id.Value);
+            if (planToSoftDelete != null)
             {
-                return RedirectToPage("./Index");
+                planToSoftDelete.IsDeleted = true;
+                
+                var userIdClaim = User.FindFirst("UserId");
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+                {
+                    planToSoftDelete.LastModifiedBy = userId;
+                }
+
+                var updateResult = await _productPlanQuangNDService.UpdateAsync(planToSoftDelete);
+                if (updateResult > 0)
+                {
+                    return RedirectToPage("./Index");
+                }
             }
 
             return Page();

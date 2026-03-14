@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model FManagement.RazorWepApp.QuangND.Pages.ProductionPlanQuangNds.DetailsModel
 
 @{
@@ -42,7 +42,19 @@
                             </tr>
                             <tr>
                                 <th class="text-muted"><i class="bi bi-exclamation-triangle"></i> Priority</th>
-                                <td id="ProductionPlanQuangNd_PriorityLevel">@Html.DisplayFor(model => model.ProductionPlanQuangNd.PriorityLevel)</td>
+                                <td id="ProductionPlanQuangNd_PriorityLevel">
+                                    @{
+                                        var priorityValue = Model.ProductionPlanQuangNd.PriorityLevel ?? 0;
+                                        var priorityText = priorityValue switch
+                                        {
+                                            2 => "High",
+                                            1 => "Medium",
+                                            0 => "Low",
+                                            _ => "N/A"
+                                        };
+                                    }
+                                    @priorityText
+                                </td>
                             </tr>
                             <tr>
                                 <th class="text-muted"><i class="bi bi-building"></i> Kitchen</th>
@@ -63,7 +75,16 @@
                             </tr>
                             <tr>
                                 <th class="text-muted"><i class="bi bi-box-seam"></i> Actual Qty</th>
-                                <td id="ProductionPlanQuangNd_ActualProducedQuantity"><strong class="text-success">@Html.DisplayFor(model => model.ProductionPlanQuangNd.ActualProducedQuantity)</strong></td>
+                                <td id="ProductionPlanQuangNd_ActualProducedQuantity">
+                                    @if (Model.ProductionPlanQuangNd.ActualProducedQuantity.HasValue)
+                                    {
+                                        <strong class="text-success">@Model.ProductionPlanQuangNd.ActualProducedQuantity</strong>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fst-italic">N/A</span>
+                                    }
+                                </td>
                             </tr>
                             <tr>
                                 <th class="text-muted"><i class="bi bi-cart"></i> Order Item</th>
@@ -75,7 +96,16 @@
                             </tr>
                             <tr>
                                 <th class="text-muted"><i class="bi bi-person"></i> Modified By</th>
-                                <td id="ProductionPlanQuangNd_LastModifiedBy">@Html.DisplayFor(model => model.ProductionPlanQuangNd.LastModifiedBy)</td>
+                                <td id="ProductionPlanQuangNd_LastModifiedBy">
+                                    @if (Model.ProductionPlanQuangNd.LastModifiedBy.HasValue)
+                                    {
+                                        @Model.ProductionPlanQuangNd.LastModifiedBy
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fst-italic">N/A</span>
+                                    }
+                                </td>
                             </tr>
                             <tr>
                                 <th class="text-muted"><i class="bi bi-trash"></i> Deleted</th>
@@ -124,7 +154,9 @@
                 document.getElementById("ProductionPlanQuangNd_StartTime").innerHTML = item.startTime ? new Date(item.startTime).toLocaleString() : '';
                 document.getElementById("ProductionPlanQuangNd_EndTime").innerHTML = item.endTime ? new Date(item.endTime).toLocaleString() : '';
                 document.getElementById("ProductionPlanQuangNd_PlanStatus").innerHTML = item.planStatus || '';
-                document.getElementById("ProductionPlanQuangNd_PriorityLevel").innerHTML = item.priorityLevel || '';
+                var priorityValue = parseInt(item.priorityLevel) || 0;
+                var priorityText = priorityValue === 2 ? "High" : (priorityValue === 1 ? "Medium" : (priorityValue === 0 ? "Low" : "N/A"));
+                document.getElementById("ProductionPlanQuangNd_PriorityLevel").innerHTML = priorityText;
                 document.getElementById("ProductionPlanQuangNd_KitchenName").innerHTML = item.kitchen?.kitchenName || '';
                 document.getElementById("ProductionPlanQuangNd_TotalExpectedQuantity").innerHTML = item.totalExpectedQuantity || '';
                 document.getElementById("ProductionPlanQuangNd_ActualProducedQuantity").innerHTML = item.actualProducedQuantity || '';

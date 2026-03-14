@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model FManagement.RazorWepApp.QuangND.Pages.ProductionPlanQuangNds.IndexModel
 
 @{
@@ -144,27 +144,40 @@
                 </table>
             </div>
         </div>
+    <!-- Pagination -->
+    <div class="row mt-3">
+        <div class="col-12">
+            <nav aria-label="Table pagination">
+                <ul class="pagination justify-content-center" id="pagination"></ul>
+            </nav>
+        </div>
     </div>
 </div>
 
 @section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/table-pagination.js"></script>
     <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+    <script>
+        $(function() {
+            $('#productionPlansTable').createTablePagination({
+                rowPerPage: 2,
+            });
+        });
+    </script>
     <script>
         "use strict";
 
-        // Khởi tạo kết nối SignalR
         var connection = new signalR.HubConnectionBuilder()
             .withUrl("/productionPlanHub")
             .build();
 
-        // Bắt đầu kết nối
         connection.start().then(function () {
             console.log("QuangND: Connected to SignalR Hub");
         }).catch(function (err) {
             console.error("Error connecting to SignalR Hub: " + err.toString());
         });
 
-        // Helper: tạo row HTML cho một plan
         function createPlanRow(plan) {
             var trHtml = `
                 <tr data-plan-id="${plan.planId}">
@@ -192,7 +205,6 @@
             return trHtml;
         }
 
-        // Helper: hiển thị empty state khi bảng trống
         function showEmptyState() {
             var tbody = document.getElementById('productionPlansTableBody');
             if (tbody.querySelectorAll('tr[data-plan-id]').length === 0) {
@@ -200,7 +212,6 @@
             }
         }
 
-        // RECEIVER - Lắng nghe event delete từ server
         connection.on("Receiver_DeleteProductionPlan", function (planId) {
             console.log("Received delete event for plan ID: " + planId);
 
@@ -212,32 +223,26 @@
             }
         });
 
-        // RECEIVER - Lắng nghe sự kiện tạo mới
         connection.on("Receiver_CreateProductionPlan", function (item) {
             console.log("New production plan created: ", item);
 
             var tbody = document.getElementById('productionPlansTableBody');
 
-            // Xóa empty state nếu có
             var emptyRow = tbody.querySelector('td[colspan]');
             if (emptyRow) emptyRow.closest('tr').remove();
 
-            // Không thêm nếu đã tồn tại
             if (tbody.querySelector('tr[data-plan-id="' + item.planId + '"]')) return;
 
             var trHtml = createPlanRow(item);
             tbody.insertAdjacentHTML('afterbegin', trHtml);
         });
 
-        // RECEIVER - Lắng nghe sự kiện cập nhật
         connection.on("Receiver_UpdateProductionPlan", function (item) {
             console.log("Production plan updated: ", item);
 
-            // Reload trang để hiển thị dữ liệu mới nhất
             location.reload();
         });
 
-        // Lắng nghe error từ server
         connection.on("Error", function (errorMessage) {
             console.error("Error from server: " + errorMessage);
         });

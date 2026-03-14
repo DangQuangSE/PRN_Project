@@ -1,4 +1,4 @@
-﻿using FManagement.Entities.QuangND.Entities;
+using FManagement.Entities.QuangND.Entities;
 using FManagement.Repositories.QuangND.Base;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -18,7 +18,9 @@ namespace FManagement.Repositories.QuangND
             var items = await _context.ProductionPlanQuangNds
             .Include(p => p.Kitchen)
             .Include(p => p.StoreOrderItem)
-            .Include(p => p.ProductBatches).ToListAsync();
+            .Include(p => p.ProductBatches)
+            .Where(p => !p.IsDeleted)
+            .ToListAsync();
             return items ?? new List<ProductionPlanQuangNd>();
         }
         public async Task<ProductionPlanQuangNd> GetByIdAysnc(int id)
@@ -37,6 +39,7 @@ namespace FManagement.Repositories.QuangND
                 .Include(p => p.StoreOrderItem)
                 .Include(p => p.ProductBatches)
                 .Where(p =>
+                    !p.IsDeleted &&
                     (id <= 0 || p.PlanId == id) &&
                     (quantityOrdered <= 0 || (p.StoreOrderItem != null && p.StoreOrderItem.QuantityOrdered == quantityOrdered)) &&
                     (string.IsNullOrWhiteSpace(planStatus) || (p.PlanStatus != null && p.PlanStatus.Contains(planStatus)))
