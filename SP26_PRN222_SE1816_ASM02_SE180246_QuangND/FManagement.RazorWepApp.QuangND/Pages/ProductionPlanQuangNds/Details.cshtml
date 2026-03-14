@@ -154,10 +154,14 @@
                 document.getElementById("ProductionPlanQuangNd_StartTime").innerHTML = item.startTime ? new Date(item.startTime).toLocaleString() : '';
                 document.getElementById("ProductionPlanQuangNd_EndTime").innerHTML = item.endTime ? new Date(item.endTime).toLocaleString() : '';
                 document.getElementById("ProductionPlanQuangNd_PlanStatus").innerHTML = item.planStatus || '';
+                
                 var priorityValue = parseInt(item.priorityLevel) || 0;
                 var priorityText = priorityValue === 2 ? "High" : (priorityValue === 1 ? "Medium" : (priorityValue === 0 ? "Low" : "N/A"));
                 document.getElementById("ProductionPlanQuangNd_PriorityLevel").innerHTML = priorityText;
+                
+                // Update Kitchen Name using the safe DTO structure
                 document.getElementById("ProductionPlanQuangNd_KitchenName").innerHTML = item.kitchen?.kitchenName || '';
+                
                 document.getElementById("ProductionPlanQuangNd_TotalExpectedQuantity").innerHTML = item.totalExpectedQuantity || '';
                 document.getElementById("ProductionPlanQuangNd_ActualProducedQuantity").innerHTML = item.actualProducedQuantity || '';
                 document.getElementById("ProductionPlanQuangNd_StoreOrderItemId").innerHTML = item.storeOrderItemId || '';
