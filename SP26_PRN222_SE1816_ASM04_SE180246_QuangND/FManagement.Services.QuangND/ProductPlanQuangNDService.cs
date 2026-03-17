@@ -56,7 +56,7 @@ namespace FManagement.Services.QuangND
 
         }
 
-        public async Task<ProductionPlanQuangNd> GetByIdAysnc(int id)
+        public async Task<ProductionPlanQuangNd?> GetByIdAysnc(int id)
         {
             try
             {
@@ -67,7 +67,8 @@ namespace FManagement.Services.QuangND
                 throw new Exception(e.Message);
             }
         }
-        public async Task<List<ProductionPlanQuangNd>> SearchAsync(string? planStatus,
+        public async Task<List<ProductionPlanQuangNd>> SearchAsync(
+            string? planStatus,
             DateOnly? fromDate,
             DateOnly? toDate,
             int? productId)

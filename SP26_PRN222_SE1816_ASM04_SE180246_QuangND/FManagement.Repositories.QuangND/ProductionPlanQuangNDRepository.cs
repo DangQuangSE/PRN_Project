@@ -18,20 +18,24 @@ namespace FManagement.Repositories.QuangND
             var items = await _context.ProductionPlanQuangNds
             .Include(p => p.Kitchen)
             .Include(p => p.StoreOrderItem)
-            .Include(p => p.ProductBatches).ToListAsync();
+                .ThenInclude(s => s.Product)
+            .Include(p => p.ProductBatches)
+            .Where(p => !p.IsDeleted)
+            .ToListAsync();
             return items ?? new List<ProductionPlanQuangNd>();
         }
-        public async Task<ProductionPlanQuangNd> GetByIdAysnc(int id)
+        public async Task<ProductionPlanQuangNd?> GetByIdAysnc(int id)
         {
-            var item = await _context.ProductionPlanQuangNds
+            return await _context.ProductionPlanQuangNds
             .Include(p => p.Kitchen)
             .Include(p => p.StoreOrderItem)
+                .ThenInclude(s => s.Product)
             .Include(p => p.ProductBatches)
-            .FirstOrDefaultAsync(p => p.PlanId == id);
-            return item ?? new ProductionPlanQuangNd();
+            .FirstOrDefaultAsync(p => p.PlanId == id && !p.IsDeleted);
         }
-        public async Task<List<ProductionPlanQuangNd>> SearchAsync(string? planStatus,
-            DateOnly? fromDate,
+        public async Task<List<ProductionPlanQuangNd>> SearchAsync(
+            string? planStatus,
+            DateOnly? fromDate,         
             DateOnly? toDate,
             int? productId)
         {
