@@ -8,7 +8,6 @@
 @inject IProductPlanQuangNDService _productPlanQuangNDService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
-@inject IJSRuntime JS
 <PageTitle>Index</PageTitle>
 
 <h1>Index</h1>
@@ -126,14 +125,6 @@
         }
 
         await LoadData();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (ProductionPlanQuangNds != null)
-        {
-            await JS.InvokeVoidAsync("initializePagination");
-        }
     }
 
     private async Task LoadData()

@@ -29,6 +29,12 @@
                 });
             }
         }
+
+        // Initialize on full page load
+        document.addEventListener('DOMContentLoaded', window.initializePagination);
+
+        // Initialize on Blazor enhanced navigation (if any)
+        document.addEventListener('blazor:enhancedload', window.initializePagination);
     </script>
 </body>
 
