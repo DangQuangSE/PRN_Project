@@ -1,174 +1,149 @@
-@page "/productionplanquangnds/create"
-@attribute [Authorize]
-@attribute [RequireAntiforgeryToken(required: false)]
-@using Microsoft.AspNetCore.Antiforgery
-@using FManagement.Services.QuangND
-@using Microsoft.EntityFrameworkCore
-@using Microsoft.AspNetCore.Components.Authorization
+﻿@page "/productionplanquangnds/create"
 @using FManagement.Entities.QuangND.Entities
-@inject IProductPlanQuangNDService _productPlanQuangNDService
-@inject AuthenticationStateProvider AuthStateProvider
+@using FManagement.Services.QuangND
+@inject IProductPlanQuangNDService ProductPlanService
+@inject ICentralKitchenService KitchenService
+@inject StoreOrderItemQuangNDService OrderItemService
 @inject NavigationManager NavigationManager
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Create Production Plan</PageTitle>
 
-<h1>Create</h1>
+<div class="create-plan-page">
+    <div class="container py-4">
+        <div class="plan-form-wrapper">
+            <div class="plan-form-header">
+                <div>
+                    <h1 class="page-title">Create Production Plan</h1>
+                    <p class="page-subtitle">
+                        Fill in the information below to create a new production plan.
+                    </p>
+                </div>
+                <a href="/productionplanquangnds" class="btn btn-light btn-back">
+                    ← Back to List
+                </a>
+            </div>
 
-<h2>ProductionPlanQuangNd</h2>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <EditForm method="post" Model="ProductionPlanQuangNd" OnValidSubmit="AddProductionPlanQuangNd" FormName="create" Enhance>
-            <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert" />
-            <div class="mb-3">
-                <label for="storeorderitemid" class="form-label">StoreOrderItem:</label>
-                <InputSelect id="storeorderitemid" @bind-Value="ProductionPlanQuangNd.StoreOrderItemId" class="form-select">
-                    <option value="0">-- Select Order Item --</option>
-                    @foreach (var item in StoreOrderItems)
-                    {
-                        <option value="@item.OrderItemId">#@item.OrderItemId - @(item.Product?.ProductName ?? "N/A") (Qty: @item.QuantityOrdered)</option>
-                    }
-                </InputSelect>
-                <ValidationMessage For="() => ProductionPlanQuangNd.StoreOrderItemId" class="text-danger" />
+            <div class="plan-form-card">
+                <EditForm method="post" Model="ProductionPlanQuangNd" OnValidSubmit="AddProductionPlanQuangNd" FormName="create" Enhance>
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="alert alert-danger mb-4" role="alert" />
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label for="storeorderitemid" class="form-label custom-label">Store Order Item</label>
+                            <InputSelect id="storeorderitemid" @bind-Value="ProductionPlanQuangNd.StoreOrderItemId" class="form-select custom-input">
+                                <option value="">-- Select Store Order Item --</option>
+                                @foreach (var item in OrderItems)
+                                {
+                                    <option value="@item.OrderItemId">@($"{item.Product.ProductName} (Order: {item.OrderId})")</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="() => ProductionPlanQuangNd.StoreOrderItemId" class="text-danger small mt-1 d-block" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="kitchenid" class="form-label custom-label">Kitchen</label>
+                            <InputSelect id="kitchenid" @bind-Value="ProductionPlanQuangNd.KitchenId" class="form-select custom-input">
+                                <option value="">-- Select Kitchen --</option>
+                                @foreach (var kitchen in Kitchens)
+                                {
+                                    <option value="@kitchen.KitchenId">@kitchen.KitchenName</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="() => ProductionPlanQuangNd.KitchenId" class="text-danger small mt-1 d-block" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="plandate" class="form-label custom-label">Plan Date</label>
+                            <InputDate id="plandate" @bind-Value="ProductionPlanQuangNd.PlanDate" class="form-control custom-input" />
+                            <ValidationMessage For="() => ProductionPlanQuangNd.PlanDate" class="text-danger small mt-1 d-block" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="starttime" class="form-label custom-label">Start Time</label>
+                            <InputDate id="starttime" @bind-Value="ProductionPlanQuangNd.StartTime" class="form-control custom-input" />
+                            <ValidationMessage For="() => ProductionPlanQuangNd.StartTime" class="text-danger small mt-1 d-block" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="endtime" class="form-label custom-label">End Time</label>
+                            <InputDate id="endtime" @bind-Value="ProductionPlanQuangNd.EndTime" class="form-control custom-input" />
+                            <ValidationMessage For="() => ProductionPlanQuangNd.EndTime" class="text-danger small mt-1 d-block" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="planstatus" class="form-label custom-label">Plan Status</label>
+                            <InputText id="planstatus" @bind-Value="ProductionPlanQuangNd.PlanStatus" class="form-control custom-input" placeholder="Enter plan status" />
+                            <ValidationMessage For="() => ProductionPlanQuangNd.PlanStatus" class="text-danger small mt-1 d-block" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="prioritylevel" class="form-label custom-label">Priority Level</label>
+                            <InputNumber id="prioritylevel" @bind-Value="ProductionPlanQuangNd.PriorityLevel" class="form-control custom-input" placeholder="Enter priority level" />
+                            <ValidationMessage For="() => ProductionPlanQuangNd.PriorityLevel" class="text-danger small mt-1 d-block" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="totalexpectedquantity" class="form-label custom-label">Total Expected Quantity</label>
+                            <InputNumber id="totalexpectedquantity" @bind-Value="ProductionPlanQuangNd.TotalExpectedQuantity" class="form-control custom-input" placeholder="Enter expected quantity" />
+                            <ValidationMessage For="() => ProductionPlanQuangNd.TotalExpectedQuantity" class="text-danger small mt-1 d-block" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="actualproducedquantity" class="form-label custom-label">Actual Produced Quantity</label>
+                            <InputNumber id="actualproducedquantity" @bind-Value="ProductionPlanQuangNd.ActualProducedQuantity" class="form-control custom-input" placeholder="Enter produced quantity" />
+                            <ValidationMessage For="() => ProductionPlanQuangNd.ActualProducedQuantity" class="text-danger small mt-1 d-block" />
+                        </div>
+
+                        <div class="col-12">
+                            <label for="batchnotes" class="form-label custom-label">Batch Notes</label>
+                            <InputTextArea id="batchnotes" @bind-Value="ProductionPlanQuangNd.BatchNotes" class="form-control custom-input custom-textarea" placeholder="Enter notes for this production batch" />
+                            <ValidationMessage For="() => ProductionPlanQuangNd.BatchNotes" class="text-danger small mt-1 d-block" />
+                        </div>
+                    </div>
+
+                    <div class="form-actions mt-4">
+                        <a href="/productionplanquangnds" class="btn btn-outline-secondary btn-lg px-4">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg px-4 btn-create">
+                            Create Plan
+                        </button>
+                    </div>
+                </EditForm>
             </div>
-            <div class="mb-3">
-                <label for="kitchenid" class="form-label">Kitchen:</label>
-                <InputSelect id="kitchenid" @bind-Value="ProductionPlanQuangNd.KitchenId" class="form-select">
-                    <option value="0">-- Select Kitchen --</option>
-                    @foreach (var kitchen in Kitchens)
-                    {
-                        <option value="@kitchen.KitchenId">@kitchen.KitchenName</option>
-                    }
-                </InputSelect>
-                <ValidationMessage For="() => ProductionPlanQuangNd.KitchenId" class="text-danger" />
-            </div>
-            <div class="mb-3">
-                <label for="plandate" class="form-label">PlanDate:</label>
-                <InputDate id="plandate" @bind-Value="ProductionPlanQuangNd.PlanDate" class="form-control" />
-                <ValidationMessage For="() => ProductionPlanQuangNd.PlanDate" class="text-danger" />
-            </div>
-            <div class="mb-3">
-                <label for="starttime" class="form-label">StartTime:</label>
-                <InputDate id="starttime" @bind-Value="ProductionPlanQuangNd.StartTime" class="form-control" />
-                <ValidationMessage For="() => ProductionPlanQuangNd.StartTime" class="text-danger" />
-            </div>
-            <div class="mb-3">
-                <label for="endtime" class="form-label">EndTime:</label>
-                <InputDate id="endtime" @bind-Value="ProductionPlanQuangNd.EndTime" class="form-control" />
-                <ValidationMessage For="() => ProductionPlanQuangNd.EndTime" class="text-danger" />
-            </div>
-            <div class="mb-3">
-                <label for="planstatus" class="form-label">PlanStatus:</label>
-                <InputSelect id="planstatus" @bind-Value="ProductionPlanQuangNd.PlanStatus" class="form-select">
-                    <option value="Pending">Pending</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
-                </InputSelect>
-                <ValidationMessage For="() => ProductionPlanQuangNd.PlanStatus" class="text-danger" />
-            </div>
-            <div class="mb-3">
-                <label for="prioritylevel" class="form-label">PriorityLevel:</label>
-                <InputSelect @bind-Value="ProductionPlanQuangNd.PriorityLevel" class="form-select" id="prioritylevel">
-                    <option value="0">Low</option>
-                    <option value="1">Medium</option>
-                    <option value="2">High</option>
-                </InputSelect>
-                <ValidationMessage For="() => ProductionPlanQuangNd.PriorityLevel" class="text-danger" />
-            </div>
-            <div class="mb-3">
-                <label for="totalexpectedquantity" class="form-label">TotalExpectedQuantity:</label>
-                <InputNumber id="totalexpectedquantity" @bind-Value="ProductionPlanQuangNd.TotalExpectedQuantity" class="form-control" />
-                <ValidationMessage For="() => ProductionPlanQuangNd.TotalExpectedQuantity" class="text-danger" />
-            </div>
-            <div class="mb-3">
-                <label for="actualproducedquantity" class="form-label">ActualProducedQuantity:</label>
-                <InputNumber id="actualproducedquantity" @bind-Value="ProductionPlanQuangNd.ActualProducedQuantity" class="form-control" />
-                <ValidationMessage For="() => ProductionPlanQuangNd.ActualProducedQuantity" class="text-danger" />
-            </div>
-            <div class="mb-3">
-                <label for="batchnotes" class="form-label">BatchNotes:</label>
-                <InputText id="batchnotes" @bind-Value="ProductionPlanQuangNd.BatchNotes" class="form-control" />
-                <ValidationMessage For="() => ProductionPlanQuangNd.BatchNotes" class="text-danger" />
-            </div>
-            <div class="mb-3">
-                <label for="lastmodifiedby" class="form-label">LastModifiedBy:</label>
-                <input id="lastmodifiedby" value="@ProductionPlanQuangNd.LastModifiedBy" class="form-control" readonly />
-            </div>
-            <div class="mb-3">
-                <label for="isdeleted" class="form-label">IsDeleted:</label>
-                <InputCheckbox id="isdeleted" @bind-Value="ProductionPlanQuangNd.IsDeleted" class="form-check-input" />
-                <ValidationMessage For="() => ProductionPlanQuangNd.IsDeleted" class="text-danger" />
-            </div>
-            <button type="submit" class="btn btn-primary">Create</button>
-        </EditForm>
+        </div>
     </div>
-</div>
-
-<div>
-    <a href="/productionplanquangnds">Back to List</a>
 </div>
 
 @code {
     [SupplyParameterFromForm]
-    private ProductionPlanQuangNd ProductionPlanQuangNd { get; set; } = new ProductionPlanQuangNd()
-    {
-        StoreOrderItemId = 0,
-        KitchenId = 0,
-        PlanDate = DateOnly.FromDateTime(DateTime.Now),
-        StartTime = DateTime.Now,
-        EndTime = DateTime.Now.AddHours(2),
-        PlanStatus = "Pending",
-        PriorityLevel = 1,
-        TotalExpectedQuantity = 0,
-        ActualProducedQuantity = 0,
-        BatchNotes = "",
-        IsDeleted = false
-    };
+    private ProductionPlanQuangNd ProductionPlanQuangNd { get; set; } = new();
 
-    private List<CentralKitchen> Kitchens { get; set; } = new();
-    private List<StoreOrderItemQuangNd> StoreOrderItems { get; set; } = new();
+    private List<StoreOrderItemQuangNd> OrderItems = new();
+    private List<CentralKitchen> Kitchens = new();
 
     protected override async Task OnInitializedAsync()
     {
-        // Check authentication
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        var userIdClaim = user.FindFirst("UserId")?.Value;
-        
-        if (!int.TryParse(userIdClaim, out int currentUserId) || currentUserId <= 0)
-        {
-            NavigationManager.NavigateTo("/forbidden", forceLoad: true);
-            return;
-        }
-
-        using var context = new FranchiseManagementContext();
-        Kitchens = await context.CentralKitchens.ToListAsync();
-        StoreOrderItems = await context.StoreOrderItemQuangNds.Include(x => x.Product).ToListAsync();
-
-        ProductionPlanQuangNd.LastModifiedBy = currentUserId;
-        // No need to reassign ProductionPlanQuangNd, defaults are already set above
+        OrderItems = await OrderItemService.GetAllAsync();
+        Kitchens = await KitchenService.GetAllAsync();
     }
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddProductionPlanQuangNd()
     {
+        var result = 0;
         try
         {
-            await _productPlanQuangNDService.CreateAsync(ProductionPlanQuangNd);
-        }
-        catch (NavigationException)
-        {
-            // Re-throw it so the Blazor framework can catch it and perform the redirect!
-            throw;
+            result = await ProductPlanService.CreateAsync(ProductionPlanQuangNd);
         }
         catch (Exception ex)
         {
-            // Handle exceptions (e.g., log the error, show a message to the user, etc.)
-            Console.Error.WriteLine($"Error creating production plan: {ex.Message}");
-            // Optionally, you could display an error message to the user using a component or state variable
+            throw new Exception("Error creating record: " + ex.Message);
         }
-        NavigationManager.NavigateTo("/productionplanquangnds");
+
+        if (result > 0)
+        {
+            NavigationManager.NavigateTo("/productionplanquangnds");
+        }
     }
 }

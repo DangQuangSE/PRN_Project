@@ -1,4 +1,6 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+@using Microsoft.AspNetCore.Components.Authorization
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">FManagement.BlazorWebApp.QuangND</a>
     </div>
@@ -15,9 +17,10 @@
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="/productionplanquangnds" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> ProductionPlanQuangND
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Production Plan
             </NavLink>
         </div>
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="counter">
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
@@ -28,6 +31,23 @@
             <NavLink class="nav-link" href="weather">
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
             </NavLink>
+        </div>
+        <div class="nav-item px-3 mt-4 pt-4 border-top">
+            <AuthorizeView Context="authContext">
+                <Authorized>
+                    <div class="nav-link text-white small">
+                        Hello, @authContext.User.Identity?.Name
+                    </div>
+                    <NavLink class="nav-link text-danger" href="/Account/Logout">
+                         Logout
+                    </NavLink>
+                </Authorized>
+                <NotAuthorized>
+                    <NavLink class="nav-link" href="/Account/Login">
+                         Login
+                    </NavLink>
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
     </nav>
 </div>

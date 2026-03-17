@@ -7,11 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\FPTSupport\FranchiseManagement\SP26_PRN222_SE1816_ASM04_SE180246_QuangND\FManagement.Services.QuangND\FManagement.Services.QuangND.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Components\Pages\ProductionPlanQuangNds\" />
+    <ProjectReference Include="..\FManagement.Services.QuangND\FManagement.Services.QuangND.csproj" />
   </ItemGroup>
 
   <ItemGroup>

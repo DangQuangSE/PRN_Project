@@ -1,13 +1,23 @@
 @page "/productionplanquangnds/edit"
+<<<<<<< Updated upstream
 @attribute [RequireAntiforgeryToken(required: false)]
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Antiforgery
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.Authorization
 @using FManagement.Entities.QuangND.Entities
+=======
+>>>>>>> Stashed changes
 @using FManagement.Services.QuangND
+@using FManagement.Entities.QuangND.Entities
+@using Microsoft.EntityFrameworkCore
 @inject IProductPlanQuangNDService ProductPlanService
+<<<<<<< Updated upstream
 @inject AuthenticationStateProvider AuthStateProvider
+=======
+@inject ICentralKitchenService KitchenService
+@inject StoreOrderItemQuangNDService OrderItemService
+>>>>>>> Stashed changes
 @inject NavigationManager NavigationManager
 
 <PageTitle>Edit</PageTitle>
@@ -29,13 +39,25 @@ else
                 <ValidationSummary role="alert"/>
                 <input type="hidden" name="ProductionPlanQuangNd.PlanId" value="@ProductionPlanQuangNd.PlanId" />
                 <div class="mb-3">
-                    <label for="storeorderitemid" class="form-label">StoreOrderItemId:</label>
-                    <InputNumber id="storeorderitemid" @bind-Value="ProductionPlanQuangNd.StoreOrderItemId" class="form-control" />
+                    <label for="storeorderitemid" class="form-label">StoreOrderItem:</label>
+                    <InputSelect id="storeorderitemid" @bind-Value="ProductionPlanQuangNd.StoreOrderItemId" class="form-select">
+                        <option value="">-- Select Store Order Item --</option>
+                        @foreach (var item in OrderItems)
+                        {
+                            <option value="@item.OrderItemId">@($"{item.Product.ProductName} (Order: {item.OrderId})")</option>
+                        }
+                    </InputSelect>
                     <ValidationMessage For="() => ProductionPlanQuangNd.StoreOrderItemId" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="kitchenid" class="form-label">KitchenId:</label>
-                    <InputNumber id="kitchenid" @bind-Value="ProductionPlanQuangNd.KitchenId" class="form-control" />
+                    <label for="kitchenid" class="form-label">Kitchen:</label>
+                    <InputSelect id="kitchenid" @bind-Value="ProductionPlanQuangNd.KitchenId" class="form-select">
+                        <option value="">-- Select Kitchen --</option>
+                        @foreach (var kitchen in Kitchens)
+                        {
+                            <option value="@kitchen.KitchenId">@kitchen.KitchenName</option>
+                        }
+                    </InputSelect>
                     <ValidationMessage For="() => ProductionPlanQuangNd.KitchenId" class="text-danger" />
                 </div>
                 <div class="mb-3">
@@ -78,15 +100,6 @@ else
                     <InputText id="batchnotes" @bind-Value="ProductionPlanQuangNd.BatchNotes" class="form-control" />
                     <ValidationMessage For="() => ProductionPlanQuangNd.BatchNotes" class="text-danger" />
                 </div>
-                <div class="mb-3">
-                    <label for="lastmodifiedby" class="form-label">LastModifiedBy:</label>
-                    <input id="lastmodifiedby" value="@ProductionPlanQuangNd.LastModifiedBy" class="form-control" readonly />
-                </div>
-                <div class="mb-3">
-                    <label for="isdeleted" class="form-label">IsDeleted:</label>
-                    <InputCheckbox id="isdeleted" @bind-Value="ProductionPlanQuangNd.IsDeleted" class="form-check-input" />
-                    <ValidationMessage For="() => ProductionPlanQuangNd.IsDeleted" class="text-danger" />
-                </div>
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>
         </div>
@@ -104,21 +117,50 @@ else
     [SupplyParameterFromForm]
     private ProductionPlanQuangNd? ProductionPlanQuangNd { get; set; }
 
+<<<<<<< Updated upstream
     protected override async Task OnInitializedAsync()
     {
         // Load data via Service
         ProductionPlanQuangNd ??= await ProductPlanService.GetByIdAysnc(PlanId);
+=======
+    private List<StoreOrderItemQuangNd> OrderItems = new();
+    private List<CentralKitchen> Kitchens = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ProductionPlanQuangNd ??= await ProductPlanService.GetByIdAsync(PlanId);
+>>>>>>> Stashed changes
 
         if (ProductionPlanQuangNd is null)
         {
             NavigationManager.NavigateTo("notfound");
         }
+        else
+        {
+            OrderItems = await OrderItemService.GetAllAsync();
+            Kitchens = await KitchenService.GetAllAsync();
+        }
     }
 
     private async Task UpdateProductionPlanQuangNd()
     {
-        if (ProductionPlanQuangNd == null) return;
+        try
+        {
+            await ProductPlanService.UpdateAsync(ProductionPlanQuangNd!);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!await ProductionPlanQuangNdExists(ProductionPlanQuangNd!.PlanId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
 
+<<<<<<< Updated upstream
         try
         {
             // We fetch the current user dynamically on save
@@ -141,4 +183,14 @@ else
 
         NavigationManager.NavigateTo("/productionplanquangnds");
     }
+=======
+        NavigationManager.NavigateTo("/productionplanquangnds");
+    }
+
+    private async Task<bool> ProductionPlanQuangNdExists(int planid)
+    {
+        var item = await ProductPlanService.GetByIdAsync(planid);
+        return item != null;
+    }
+>>>>>>> Stashed changes
 }

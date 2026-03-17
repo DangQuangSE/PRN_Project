@@ -1,4 +1,4 @@
-﻿using FManagement.Entities.QuangND.Entities;
+using FManagement.Entities.QuangND.Entities;
 using FManagement.Repositories.QuangND.Base;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,9 +13,13 @@ namespace FManagement.Repositories.QuangND
     {
         public SystemAccountRepository() { }
         public SystemAccountRepository(FranchiseManagementContext context) => _context = context;
-        public async Task<SystemUserAccount> GetByUserAccountAsync(string username, string password)
+        public async Task<SystemUserAccount?> GetByUserAccountAsync(string username, string password)
         {
-            return await _context.SystemUserAccounts.FirstOrDefaultAsync(u => u.UserName == username && u.Password == password && u.IsActive) ?? new SystemUserAccount();
+            return await _context.SystemUserAccounts.FirstOrDefaultAsync(u => u.UserName == username && u.Password == password && u.IsActive);
+        }
+        public async Task<SystemUserAccount?> GetByIdAsync(int id)
+        {
+            return await _context.SystemUserAccounts.FirstOrDefaultAsync(u => u.UserAccountId == id);
         }
     }
 }

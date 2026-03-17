@@ -1,13 +1,20 @@
 @page "/productionplanquangnds/delete"
+<<<<<<< Updated upstream
 @attribute [RequireAntiforgeryToken(required: false)]
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Antiforgery
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.Authorization
 @using FManagement.Entities.QuangND.Entities
+=======
+>>>>>>> Stashed changes
 @using FManagement.Services.QuangND
+@using FManagement.Entities.QuangND.Entities
 @inject IProductPlanQuangNDService ProductPlanService
+<<<<<<< Updated upstream
 @inject AuthenticationStateProvider AuthStateProvider
+=======
+>>>>>>> Stashed changes
 @inject NavigationManager NavigationManager
 
 <PageTitle>Delete</PageTitle>
@@ -24,12 +31,12 @@
     }
     else {
         <dl class="row">
-            <dt class="col-sm-2">StoreOrderItemId</dt>
-            <dd class="col-sm-10">@productionplanquangnd.StoreOrderItemId</dd>
+            <dt class="col-sm-2">StoreOrderItem</dt>
+            <dd class="col-sm-10">@($"{productionplanquangnd.StoreOrderItem?.Product?.ProductName} (Order: {productionplanquangnd.StoreOrderItem?.OrderId})")</dd>
         </dl>
         <dl class="row">
-            <dt class="col-sm-2">KitchenId</dt>
-            <dd class="col-sm-10">@productionplanquangnd.KitchenId</dd>
+            <dt class="col-sm-2">Kitchen</dt>
+            <dd class="col-sm-10">@productionplanquangnd.Kitchen?.KitchenName</dd>
         </dl>
         <dl class="row">
             <dt class="col-sm-2">PlanDate</dt>
@@ -63,14 +70,6 @@
             <dt class="col-sm-2">BatchNotes</dt>
             <dd class="col-sm-10">@productionplanquangnd.BatchNotes</dd>
         </dl>
-        <dl class="row">
-            <dt class="col-sm-2">LastModifiedBy</dt>
-            <dd class="col-sm-10">@productionplanquangnd.LastModifiedBy</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">IsDeleted</dt>
-            <dd class="col-sm-10">@productionplanquangnd.IsDeleted</dd>
-        </dl>
         <EditForm method="post" Model="productionplanquangnd" OnValidSubmit="DeleteProductionPlanQuangNd" FormName="delete" Enhance>
             <button type="submit" class="btn btn-danger" disabled="@(productionplanquangnd is null)">Delete</button> |
             <a href="/productionplanquangnds">Back to List</a>
@@ -86,8 +85,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+<<<<<<< Updated upstream
         // Load data via Service
         productionplanquangnd = await ProductPlanService.GetByIdAysnc(PlanId);
+=======
+        productionplanquangnd = await ProductPlanService.GetByIdAsync(PlanId);
+>>>>>>> Stashed changes
 
         if (productionplanquangnd is null)
         {
@@ -97,6 +100,7 @@
 
     private async Task DeleteProductionPlanQuangNd()
     {
+<<<<<<< Updated upstream
         if (productionplanquangnd == null) return;
 
         // Fetch user dynamically if required for service
@@ -111,6 +115,9 @@
         }
 
         var result = await ProductPlanService.DeleteAsync(productionplanquangnd.PlanId, currentUserId);
+=======
+        await ProductPlanService.DeleteAsync(PlanId);
+>>>>>>> Stashed changes
         NavigationManager.NavigateTo("/productionplanquangnds");
     }
 }

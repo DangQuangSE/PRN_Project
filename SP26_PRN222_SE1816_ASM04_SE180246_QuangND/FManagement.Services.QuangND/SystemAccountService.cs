@@ -1,4 +1,4 @@
-﻿using FManagement.Entities.QuangND.Entities;
+using FManagement.Entities.QuangND.Entities;
 using FManagement.Repositories.QuangND;
 using System;
 using System.Collections.Generic;
@@ -13,13 +13,28 @@ namespace FManagement.Services.QuangND
         private readonly SystemAccountRepository _systemAccountRepository;
         private SystemUserAccount? _currentUser;
 
-        public SystemAccountService() => _systemAccountRepository ??= new SystemAccountRepository();
+        public SystemAccountService(SystemAccountRepository systemAccountRepository)
+        {
+            _systemAccountRepository = systemAccountRepository;
+        }
 
-        public async Task<SystemUserAccount> GetByUserAccountAsync(string username, string password)
+        public async Task<SystemUserAccount?> GetByUserAccountAsync(string username, string password)
         {
             try
             {
                 return await _systemAccountRepository.GetByUserAccountAsync(username, password);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<SystemUserAccount?> GetByIdAsync(int id)
+        {
+            try
+            {
+                return await _systemAccountRepository.GetByIdAsync(id);
             }
             catch (Exception e)
             {

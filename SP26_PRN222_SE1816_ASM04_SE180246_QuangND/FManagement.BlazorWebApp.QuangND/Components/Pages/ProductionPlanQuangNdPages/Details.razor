@@ -1,8 +1,14 @@
 @page "/productionplanquangnds/details"
+<<<<<<< Updated upstream
 @attribute [Authorize]
 @using Microsoft.EntityFrameworkCore
 @using FManagement.Entities.QuangND.Entities
 @inject FManagement.Services.QuangND.IProductPlanQuangNDService ProductPlanService
+=======
+@using FManagement.Services.QuangND
+@using FManagement.Entities.QuangND.Entities
+@inject IProductPlanQuangNDService ProductPlanService
+>>>>>>> Stashed changes
 @inject NavigationManager NavigationManager
 @inject IDbContextFactory<FranchiseManagementContext> DbFactory
 
@@ -20,7 +26,7 @@
     else {
         <dl class="row">
             <dt class="col-sm-2">StoreOrderItem</dt>
-            <dd class="col-sm-10">#@productionplanquangnd.StoreOrderItemId - @(productionplanquangnd.StoreOrderItem?.Product?.ProductName ?? "N/A")</dd>
+            <dd class="col-sm-10">@($"{productionplanquangnd.StoreOrderItem?.Product?.ProductName} (Order: {productionplanquangnd.StoreOrderItem?.OrderId})")</dd>
             <dt class="col-sm-2">Kitchen</dt>
             <dd class="col-sm-10">@productionplanquangnd.Kitchen?.KitchenName</dd>
             <dt class="col-sm-2">PlanDate</dt>
@@ -39,10 +45,6 @@
             <dd class="col-sm-10">@productionplanquangnd.ActualProducedQuantity</dd>
             <dt class="col-sm-2">BatchNotes</dt>
             <dd class="col-sm-10">@productionplanquangnd.BatchNotes</dd>
-            <dt class="col-sm-2">LastModifiedBy</dt>
-            <dd class="col-sm-10">@productionplanquangnd.LastModifiedBy (@LastModifiedByName)</dd>
-            <dt class="col-sm-2">IsDeleted</dt>
-            <dd class="col-sm-10">@productionplanquangnd.IsDeleted</dd>
         </dl>
         <div>
             <a href="@($"/productionplanquangnds/edit?planid={productionplanquangnd.PlanId}")">Edit</a> |
@@ -53,28 +55,22 @@
 
 @code {
     private ProductionPlanQuangNd? productionplanquangnd;
-    private string? LastModifiedByName;
 
     [SupplyParameterFromQuery]
     private int PlanId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+<<<<<<< Updated upstream
         // Load data via Service
         productionplanquangnd = await ProductPlanService.GetByIdAysnc(PlanId);
+=======
+        productionplanquangnd = await ProductPlanService.GetByIdAsync(PlanId);
+>>>>>>> Stashed changes
 
         if (productionplanquangnd is null)
         {
             NavigationManager.NavigateTo("notfound");
-            return;
-        }
-
-        // Load LastModifiedBy name
-        if (productionplanquangnd.LastModifiedBy.HasValue)
-        {
-            using var context = DbFactory.CreateDbContext();
-            var accountUser = await context.SystemUserAccounts.FindAsync(productionplanquangnd.LastModifiedBy.Value);
-            LastModifiedByName = accountUser?.FullName ?? accountUser?.UserName ?? "Unknown";
         }
     }
 }

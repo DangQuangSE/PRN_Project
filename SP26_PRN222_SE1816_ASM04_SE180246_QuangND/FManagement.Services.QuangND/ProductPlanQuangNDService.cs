@@ -1,4 +1,4 @@
-﻿using FManagement.Entities.QuangND.Entities;
+using FManagement.Entities.QuangND.Entities;
 using FManagement.Repositories.QuangND;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ namespace FManagement.Services.QuangND
     public class ProductPlanQuangNDService : IProductPlanQuangNDService
     {
         private readonly ProductionPlanQuangNDRepository _productionPlanQuangNDRepository;
-        public ProductPlanQuangNDService() => _productionPlanQuangNDRepository ??= new ProductionPlanQuangNDRepository();
+        public ProductPlanQuangNDService() => _productionPlanQuangNDRepository = new ProductionPlanQuangNDRepository();
         public async Task<int> CreateAsync(ProductionPlanQuangNd productionPlanQuangNd)
         {
             try
@@ -28,7 +28,7 @@ namespace FManagement.Services.QuangND
         {
             try
             {
-                var item = await _productionPlanQuangNDRepository.GetByIdAysnc(id);
+                var item = await _productionPlanQuangNDRepository.GetByIdAsync(id);
                 if (item != null && item.PlanId > 0)
                 {
                     item.IsDeleted = true;
@@ -60,11 +60,11 @@ namespace FManagement.Services.QuangND
 
         }
 
-        public async Task<ProductionPlanQuangNd?> GetByIdAysnc(int id)
+        public async Task<ProductionPlanQuangNd?> GetByIdAsync(int id)
         {
             try
             {
-                return await _productionPlanQuangNDRepository.GetByIdAysnc(id);
+                return await _productionPlanQuangNDRepository.GetByIdAsync(id);
             }
             catch (Exception e)
             {

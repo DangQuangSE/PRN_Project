@@ -1,4 +1,4 @@
-﻿using FManagement.Entities.QuangND.Entities;
+using FManagement.Entities.QuangND.Entities;
 using FManagement.Repositories.QuangND.Base;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -24,7 +24,7 @@ namespace FManagement.Repositories.QuangND
             .ToListAsync();
             return items ?? new List<ProductionPlanQuangNd>();
         }
-        public async Task<ProductionPlanQuangNd?> GetByIdAysnc(int id)
+        public async Task<ProductionPlanQuangNd?> GetByIdAsync(int id)
         {
             return await _context.ProductionPlanQuangNds
             .Include(p => p.Kitchen)

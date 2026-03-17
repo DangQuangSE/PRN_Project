@@ -1,4 +1,4 @@
-﻿using FManagement.Entities.QuangND.Entities;
+using FManagement.Entities.QuangND.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace FManagement.Services.QuangND
     {
         // Query methods:
         Task<List<ProductionPlanQuangNd>> GetAllAsync();
-        Task<ProductionPlanQuangNd?> GetByIdAysnc(int id);
+        Task<ProductionPlanQuangNd?> GetByIdAsync(int id);
         Task<List<ProductionPlanQuangNd>> SearchAsync(
             string? planStatus,
             DateOnly? fromDate,
