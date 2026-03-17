@@ -3,6 +3,7 @@
 @using Microsoft.EntityFrameworkCore
 @using FManagement.Entities.QuangND.Entities
 @inject IProductPlanQuangNDService _productPlanQuangNDService
+@inject SystemAccountService SystemAccountService
 @inject NavigationManager NavigationManager
 
 <PageTitle>Create</PageTitle>
@@ -89,8 +90,7 @@
             </div>
             <div class="mb-3">
                 <label for="lastmodifiedby" class="form-label">LastModifiedBy:</label>
-                <InputNumber id="lastmodifiedby" @bind-Value="ProductionPlanQuangNd.LastModifiedBy" class="form-control" />
-                <ValidationMessage For="() => ProductionPlanQuangNd.LastModifiedBy" class="text-danger" />
+                <input id="lastmodifiedby" value="@ProductionPlanQuangNd.LastModifiedBy" class="form-control" readonly />
             </div>
             <div class="mb-3">
                 <label for="isdeleted" class="form-label">IsDeleted:</label>
@@ -115,6 +115,14 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // Check authentication
+        var currentUserId = SystemAccountService.GetCurrentUserId();
+        if (currentUserId == null || currentUserId <= 0)
+        {
+            NavigationManager.NavigateTo("/forbidden", forceLoad: true);
+            return;
+        }
+
         using var context = new FranchiseManagementContext();
         Kitchens = await context.CentralKitchens.ToListAsync();
         StoreOrderItems = await context.StoreOrderItemQuangNds.Include(x => x.Product).ToListAsync();
@@ -133,7 +141,8 @@
                 TotalExpectedQuantity = 0,
                 ActualProducedQuantity = 0,
                 BatchNotes = "",
-                IsDeleted = false
+                IsDeleted = false,
+                LastModifiedBy = currentUserId.Value
             };
         }
     }

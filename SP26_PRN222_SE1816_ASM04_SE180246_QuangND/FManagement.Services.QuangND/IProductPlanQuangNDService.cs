@@ -20,6 +20,6 @@ namespace FManagement.Services.QuangND
         // Mutation methods:
         Task<int> CreateAsync(ProductionPlanQuangNd productionPlanQuangNd);
         Task<int> UpdateAsync(ProductionPlanQuangNd productionPlanQuangNd);
-        Task<bool> DeleteAsync(int id);
+        Task<bool> DeleteAsync(int id, int? currentUserId = null);
     }
 }

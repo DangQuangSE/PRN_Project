@@ -24,7 +24,7 @@ namespace FManagement.Services.QuangND
             }
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id, int? currentUserId = null)
         {
             try
             {
@@ -32,6 +32,10 @@ namespace FManagement.Services.QuangND
                 if (item != null && item.PlanId > 0)
                 {
                     item.IsDeleted = true;
+                    if (currentUserId.HasValue)
+                    {
+                        item.LastModifiedBy = currentUserId;
+                    }
                     var result = await _productionPlanQuangNDRepository.UpdateAsync(item);
                     return result > 0;
                 }

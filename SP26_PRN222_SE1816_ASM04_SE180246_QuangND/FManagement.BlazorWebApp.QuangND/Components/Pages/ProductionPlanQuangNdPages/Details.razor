@@ -1,7 +1,10 @@
 ﻿@page "/productionplanquangnds/details"
 @using Microsoft.EntityFrameworkCore
 @using FManagement.Entities.QuangND.Entities
-@inject IDbContextFactory<FManagement.Entities.QuangND.Entities.FranchiseManagementContext> DbFactory
+@using FManagement.Services.QuangND
+@inject IProductPlanQuangNDService ProductPlanService
+@inject SystemAccountService SystemAccountService
+@inject IDbContextFactory<FranchiseManagementContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>Details</PageTitle>
@@ -17,10 +20,10 @@
     }
     else {
         <dl class="row">
-            <dt class="col-sm-2">StoreOrderItemId</dt>
-            <dd class="col-sm-10">@productionplanquangnd.StoreOrderItemId</dd>
-            <dt class="col-sm-2">KitchenId</dt>
-            <dd class="col-sm-10">@productionplanquangnd.KitchenId</dd>
+            <dt class="col-sm-2">StoreOrderItem</dt>
+            <dd class="col-sm-10">#@productionplanquangnd.StoreOrderItemId - @(productionplanquangnd.StoreOrderItem?.Product?.ProductName ?? "N/A")</dd>
+            <dt class="col-sm-2">Kitchen</dt>
+            <dd class="col-sm-10">@productionplanquangnd.Kitchen?.KitchenName</dd>
             <dt class="col-sm-2">PlanDate</dt>
             <dd class="col-sm-10">@productionplanquangnd.PlanDate</dd>
             <dt class="col-sm-2">StartTime</dt>
@@ -38,7 +41,7 @@
             <dt class="col-sm-2">BatchNotes</dt>
             <dd class="col-sm-10">@productionplanquangnd.BatchNotes</dd>
             <dt class="col-sm-2">LastModifiedBy</dt>
-            <dd class="col-sm-10">@productionplanquangnd.LastModifiedBy</dd>
+            <dd class="col-sm-10">@productionplanquangnd.LastModifiedBy (@LastModifiedByName)</dd>
             <dt class="col-sm-2">IsDeleted</dt>
             <dd class="col-sm-10">@productionplanquangnd.IsDeleted</dd>
         </dl>
@@ -51,18 +54,36 @@
 
 @code {
     private ProductionPlanQuangNd? productionplanquangnd;
+    private string? LastModifiedByName;
 
     [SupplyParameterFromQuery]
     private int PlanId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        productionplanquangnd = await context.ProductionPlanQuangNds.FirstOrDefaultAsync(m => m.PlanId == PlanId);
+        // Check authentication
+        var currentUserId = SystemAccountService.GetCurrentUserId();
+        if (currentUserId == null || currentUserId <= 0)
+        {
+            NavigationManager.NavigateTo("/forbidden", forceLoad: true);
+            return;
+        }
+
+        // Load data via Service
+        productionplanquangnd = await ProductPlanService.GetByIdAysnc(PlanId);
 
         if (productionplanquangnd is null)
         {
             NavigationManager.NavigateTo("notfound");
+            return;
+        }
+
+        // Load LastModifiedBy name
+        if (productionplanquangnd.LastModifiedBy.HasValue)
+        {
+            using var context = DbFactory.CreateDbContext();
+            var user = await context.SystemUserAccounts.FindAsync(productionplanquangnd.LastModifiedBy.Value);
+            LastModifiedByName = user?.FullName ?? user?.UserName ?? "Unknown";
         }
     }
 }

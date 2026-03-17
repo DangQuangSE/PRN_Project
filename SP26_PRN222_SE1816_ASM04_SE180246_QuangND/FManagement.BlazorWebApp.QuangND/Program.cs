@@ -13,6 +13,7 @@ internal class Program
             .AddInteractiveServerComponents();
         builder.Services.AddScoped<IProductPlanQuangNDService, ProductPlanQuangNDService>();
         builder.Services.AddScoped<StoreOrderItemQuangNDService>();
+        builder.Services.AddScoped<SystemAccountService>();
         var app = builder.Build();
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())

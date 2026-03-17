@@ -4,6 +4,8 @@
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using FManagement.Entities.QuangND.Entities
 @inject IProductPlanQuangNDService _productPlanQuangNDService
+@inject SystemAccountService SystemAccountService
+@inject NavigationManager NavigationManager
 <PageTitle>Index</PageTitle>
 
 <h1>Index</h1>
@@ -12,9 +14,44 @@
     <a href="productionplanquangnds/create">Create New</a>
 </p>
 
+<!-- Search Form -->
+<div class="mb-4">
+    <EditForm Model="searchModel" OnSubmit="SearchData">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Plan Status</label>
+                <InputSelect id="planstatus" @bind-Value="searchModel.PlanStatus" class="form-select">
+                    <option value="">All</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                </InputSelect>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">From Date</label>
+                <InputDate @bind-Value="searchModel.FromDate" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">To Date</label>
+                <InputDate @bind-Value="searchModel.ToDate" class="form-control" />
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">Search</button>
+                <button type="button" class="btn btn-secondary" @onclick="ClearSearch">Clear</button>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
 <QuickGrid Class="table" Items="ProductionPlanQuangNds">
-    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.StoreOrderItemId" />
-    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.KitchenId" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.PlanId" />
+    <TemplateColumn Title="Store Order Item">
+        @context.StoreOrderItem?.Product?.ProductName
+    </TemplateColumn>
+    <TemplateColumn Title="Kitchen">
+        @context.Kitchen?.KitchenName
+    </TemplateColumn></TemplateColumn>
     <PropertyColumn Property="productionplanquangnd => productionplanquangnd.PlanDate" />
     <PropertyColumn Property="productionplanquangnd => productionplanquangnd.StartTime" />
     <PropertyColumn Property="productionplanquangnd => productionplanquangnd.EndTime" />
@@ -22,9 +59,7 @@
     <PropertyColumn Property="productionplanquangnd => productionplanquangnd.PriorityLevel" />
     <PropertyColumn Property="productionplanquangnd => productionplanquangnd.TotalExpectedQuantity" />
     <PropertyColumn Property="productionplanquangnd => productionplanquangnd.ActualProducedQuantity" />
-    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.BatchNotes" />
     <PropertyColumn Property="productionplanquangnd => productionplanquangnd.LastModifiedBy" />
-    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.IsDeleted" />
 
     <TemplateColumn Context="productionplanquangnd">
         <a href="@($"productionplanquangnds/edit?planid={productionplanquangnd.PlanId}")">Edit</a> |
@@ -34,15 +69,40 @@
 </QuickGrid>
 
 @code {
-    //private FranchiseStoreContext context = default!;
     private IQueryable<ProductionPlanQuangNd> ProductionPlanQuangNds = default!;
+    private SearchModel searchModel = new();
+
+    private class SearchModel
+    {
+        public string? PlanStatus { get; set; }
+        public DateOnly? FromDate { get; set; }
+        public DateOnly? ToDate { get; set; }
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        // context = DbFactory.CreateDbContext();
+        // Check authentication
+        var currentUserId = SystemAccountService.GetCurrentUserId();
+        if (currentUserId == null || currentUserId <= 0)
+        {
+            NavigationManager.NavigateTo("/forbidden", forceLoad: true);
+            return;
+        }
+
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
         try
         {
-            ProductionPlanQuangNds = (await _productPlanQuangNDService.GetAllAsync()).AsQueryable();
+            var items = await _productPlanQuangNDService.SearchAsync(
+                searchModel.PlanStatus,
+                searchModel.FromDate,
+                searchModel.ToDate,
+                null
+            );
+            ProductionPlanQuangNds = items.AsQueryable();
         }
         catch (Exception ex)
         {
@@ -50,5 +110,14 @@
         }
     }
 
-    // public async ValueTask DisposeAsync() => await context.DisposeAsync();
+    private async Task SearchData()
+    {
+        await LoadData();
+    }
+
+    private async Task ClearSearch()
+    {
+        searchModel = new SearchModel();
+        await LoadData();
+    }
 }

@@ -1,7 +1,10 @@
 ﻿@page "/productionplanquangnds/delete"
 @using Microsoft.EntityFrameworkCore
 @using FManagement.Entities.QuangND.Entities
-@inject IDbContextFactory<FManagement.Entities.QuangND.Entities.FranchiseManagementContext> DbFactory
+@using FManagement.Services.QuangND
+@inject IProductPlanQuangNDService ProductPlanService
+@inject SystemAccountService SystemAccountService
+@inject IDbContextFactory<FranchiseManagementContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>Delete</PageTitle>
@@ -78,8 +81,18 @@
     [SupplyParameterFromQuery]
     private int PlanId { get; set; }
 
+    private int? CurrentUserId { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
+        // Check authentication
+        CurrentUserId = SystemAccountService.GetCurrentUserId();
+        if (CurrentUserId == null || CurrentUserId <= 0)
+        {
+            NavigationManager.NavigateTo("/forbidden", forceLoad: true);
+            return;
+        }
+
         using var context = DbFactory.CreateDbContext();
         productionplanquangnd = await context.ProductionPlanQuangNds.FirstOrDefaultAsync(m => m.PlanId == PlanId);
 
@@ -91,9 +104,9 @@
 
     private async Task DeleteProductionPlanQuangNd()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.ProductionPlanQuangNds.Remove(productionplanquangnd!);
-        await context.SaveChangesAsync();
+        if (productionplanquangnd == null) return;
+
+        var result = await ProductPlanService.DeleteAsync(productionplanquangnd.PlanId, CurrentUserId);
         NavigationManager.NavigateTo("/productionplanquangnds");
     }
 }

@@ -1,7 +1,10 @@
 ﻿@page "/productionplanquangnds/edit"
 @using Microsoft.EntityFrameworkCore
 @using FManagement.Entities.QuangND.Entities
-@inject IDbContextFactory<FManagement.Entities.QuangND.Entities.FranchiseManagementContext> DbFactory
+@using FManagement.Services.QuangND
+@inject IProductPlanQuangNDService ProductPlanService
+@inject SystemAccountService SystemAccountService
+@inject IDbContextFactory<FranchiseManagementContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>Edit</PageTitle>
@@ -74,8 +77,7 @@ else
                 </div>
                 <div class="mb-3">
                     <label for="lastmodifiedby" class="form-label">LastModifiedBy:</label>
-                    <InputNumber id="lastmodifiedby" @bind-Value="ProductionPlanQuangNd.LastModifiedBy" class="form-control" />
-                    <ValidationMessage For="() => ProductionPlanQuangNd.LastModifiedBy" class="text-danger" />
+                    <input id="lastmodifiedby" value="@ProductionPlanQuangNd.LastModifiedBy" class="form-control" readonly />
                 </div>
                 <div class="mb-3">
                     <label for="isdeleted" class="form-label">IsDeleted:</label>
@@ -99,10 +101,20 @@ else
     [SupplyParameterFromForm]
     private ProductionPlanQuangNd? ProductionPlanQuangNd { get; set; }
 
+    private int? CurrentUserId { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        ProductionPlanQuangNd ??= await context.ProductionPlanQuangNds.FirstOrDefaultAsync(m => m.PlanId == PlanId);
+        // Check authentication
+        CurrentUserId = SystemAccountService.GetCurrentUserId();
+        if (CurrentUserId == null || CurrentUserId <= 0)
+        {
+            NavigationManager.NavigateTo("/forbidden", forceLoad: true);
+            return;
+        }
+
+        // Load data via Service
+        ProductionPlanQuangNd = await ProductPlanService.GetByIdAysnc(PlanId);
 
         if (ProductionPlanQuangNd is null)
         {
@@ -114,25 +126,12 @@ else
     // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task UpdateProductionPlanQuangNd()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Attach(ProductionPlanQuangNd!).State = EntityState.Modified;
+        if (ProductionPlanQuangNd == null) return;
 
-        try
-        {
-            await context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!ProductionPlanQuangNdExists(ProductionPlanQuangNd!.PlanId))
-            {
-                NavigationManager.NavigateTo("notfound");
-            }
-            else
-            {
-                throw;
-            }
-        }
+        // Set LastModifiedBy to current user
+        ProductionPlanQuangNd.LastModifiedBy = CurrentUserId;
 
+        var result = await ProductPlanService.UpdateAsync(ProductionPlanQuangNd);
         NavigationManager.NavigateTo("/productionplanquangnds");
     }
 
