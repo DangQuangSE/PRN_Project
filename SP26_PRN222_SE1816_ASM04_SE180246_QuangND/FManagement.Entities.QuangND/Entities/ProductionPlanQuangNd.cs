@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace FManagement.Entities.QuangND.Entities;
@@ -31,9 +31,9 @@ public partial class ProductionPlanQuangNd
 
     public bool IsDeleted { get; set; }
 
-    public virtual CentralKitchen Kitchen { get; set; } = null!;
+    public virtual CentralKitchen? Kitchen { get; set; }
 
-    public virtual ICollection<ProductBatch> ProductBatches { get; set; } = new List<ProductBatch>();
+    public virtual ICollection<ProductBatch>? ProductBatches { get; set; }
 
-    public virtual StoreOrderItemQuangNd StoreOrderItem { get; set; } = null!;
+    public virtual StoreOrderItemQuangNd? StoreOrderItem { get; set; }
 }

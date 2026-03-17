@@ -1,5 +1,7 @@
 @page "/productionplanquangnds/create"
 @attribute [Authorize]
+@attribute [RequireAntiforgeryToken(required: false)]
+@using Microsoft.AspNetCore.Antiforgery
 @using FManagement.Services.QuangND
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.Authorization
@@ -110,7 +112,20 @@
 
 @code {
     [SupplyParameterFromForm]
-    private ProductionPlanQuangNd ProductionPlanQuangNd { get; set; } = new();
+    private ProductionPlanQuangNd ProductionPlanQuangNd { get; set; } = new ProductionPlanQuangNd()
+    {
+        StoreOrderItemId = 0,
+        KitchenId = 0,
+        PlanDate = DateOnly.FromDateTime(DateTime.Now),
+        StartTime = DateTime.Now,
+        EndTime = DateTime.Now.AddHours(2),
+        PlanStatus = "Pending",
+        PriorityLevel = 1,
+        TotalExpectedQuantity = 0,
+        ActualProducedQuantity = 0,
+        BatchNotes = "",
+        IsDeleted = false
+    };
 
     private List<CentralKitchen> Kitchens { get; set; } = new();
     private List<StoreOrderItemQuangNd> StoreOrderItems { get; set; } = new();
@@ -132,41 +147,28 @@
         Kitchens = await context.CentralKitchens.ToListAsync();
         StoreOrderItems = await context.StoreOrderItemQuangNds.Include(x => x.Product).ToListAsync();
 
-        if (ProductionPlanQuangNd.StoreOrderItemId == 0 && ProductionPlanQuangNd.KitchenId == 0)
-        {
-            ProductionPlanQuangNd = new ProductionPlanQuangNd
-            {
-                StoreOrderItemId = 0,
-                KitchenId = 0,
-                PlanDate = DateOnly.FromDateTime(DateTime.Now),
-                StartTime = DateTime.Now,
-                EndTime = DateTime.Now.AddHours(2),
-                PlanStatus = "Pending",
-                PriorityLevel = 1,
-                TotalExpectedQuantity = 0,
-                ActualProducedQuantity = 0,
-                BatchNotes = "",
-                IsDeleted = false,
-                LastModifiedBy = currentUserId
-            };
-        }
+        ProductionPlanQuangNd.LastModifiedBy = currentUserId;
+        // No need to reassign ProductionPlanQuangNd, defaults are already set above
     }
 
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddProductionPlanQuangNd()
     {
-        var result = 0;
         try
         {
-            result = await _productPlanQuangNDService.CreateAsync(ProductionPlanQuangNd);
-
+            await _productPlanQuangNDService.CreateAsync(ProductionPlanQuangNd);
+        }
+        catch (NavigationException)
+        {
+            // Re-throw it so the Blazor framework can catch it and perform the redirect!
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            // Handle exceptions (e.g., log the error, show a message to the user, etc.)
+            Console.Error.WriteLine($"Error creating production plan: {ex.Message}");
+            // Optionally, you could display an error message to the user using a component or state variable
         }
-        if (result > 0)
-        {
-            NavigationManager.NavigateTo("/productionplanquangnds", forceLoad: true);
-        }
+        NavigationManager.NavigateTo("/productionplanquangnds");
     }
 }
