@@ -1,11 +1,14 @@
-﻿@page "/productionplanquangnds"
+@page "/productionplanquangnds"
+@attribute [Authorize]
 @using FManagement.Services.QuangND
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.AspNetCore.Components.Authorization
 @using FManagement.Entities.QuangND.Entities
 @inject IProductPlanQuangNDService _productPlanQuangNDService
-@inject SystemAccountService SystemAccountService
+@inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JS
 <PageTitle>Index</PageTitle>
 
 <h1>Index</h1>
@@ -44,29 +47,59 @@
     </EditForm>
 </div>
 
-<QuickGrid Class="table" Items="ProductionPlanQuangNds">
-    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.PlanId" />
-    <TemplateColumn Title="Store Order Item">
-        @context.StoreOrderItem?.Product?.ProductName
-    </TemplateColumn>
-    <TemplateColumn Title="Kitchen">
-        @context.Kitchen?.KitchenName
-    </TemplateColumn></TemplateColumn>
-    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.PlanDate" />
-    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.StartTime" />
-    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.EndTime" />
-    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.PlanStatus" />
-    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.PriorityLevel" />
-    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.TotalExpectedQuantity" />
-    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.ActualProducedQuantity" />
-    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.LastModifiedBy" />
+<table class="table table-hover align-middle mb-0" id="productionPlansTable">
+    <thead class="table-light">
+        <tr>
+            <th>PlanId</th>
+            <th>Store Order Item</th>
+            <th>Kitchen</th>
+            <th>Plan Date</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Plan Status</th>
+            <th>Priority Level</th>
+            <th>Total Expected Quantity</th>
+            <th>Actual Produced Quantity</th>
+            <th>Last Modified By</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="productionPlansTableBody">
+        @if (ProductionPlanQuangNds != null)
+        {
+            @foreach (var plan in ProductionPlanQuangNds)
+            {
+                <tr>
+                    <td>@plan.PlanId</td>
+                    <td>@(plan.StoreOrderItem?.Product?.ProductName)</td>
+                    <td>@(plan.Kitchen?.KitchenName)</td>
+                    <td>@plan.PlanDate</td>
+                    <td>@plan.StartTime</td>
+                    <td>@plan.EndTime</td>
+                    <td>@plan.PlanStatus</td>
+                    <td>@plan.PriorityLevel</td>
+                    <td>@plan.TotalExpectedQuantity</td>
+                    <td>@plan.ActualProducedQuantity</td>
+                    <td>@plan.LastModifiedBy</td>
+                    <td>
+                        <a href="@($"productionplanquangnds/edit?planid={plan.PlanId}")">Edit</a> |
+                        <a href="@($"productionplanquangnds/details?planid={plan.PlanId}")">Details</a> |
+                        <a href="@($"productionplanquangnds/delete?planid={plan.PlanId}")">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
 
-    <TemplateColumn Context="productionplanquangnd">
-        <a href="@($"productionplanquangnds/edit?planid={productionplanquangnd.PlanId}")">Edit</a> |
-        <a href="@($"productionplanquangnds/details?planid={productionplanquangnd.PlanId}")">Details</a> |
-        <a href="@($"productionplanquangnds/delete?planid={productionplanquangnd.PlanId}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+<!-- Pagination -->
+<div class="row mt-3">
+    <div class="col-12">
+        <nav aria-label="Table pagination">
+            <ul class="pagination justify-content-center" id="pagination"></ul>
+        </nav>
+    </div>
+</div>
 
 @code {
     private IQueryable<ProductionPlanQuangNd> ProductionPlanQuangNds = default!;
@@ -82,14 +115,25 @@
     protected override async Task OnInitializedAsync()
     {
         // Check authentication
-        var currentUserId = SystemAccountService.GetCurrentUserId();
-        if (currentUserId == null || currentUserId <= 0)
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var userIdClaim = user.FindFirst("UserId")?.Value;
+        
+        if (!int.TryParse(userIdClaim, out int currentUserId) || currentUserId <= 0)
         {
             NavigationManager.NavigateTo("/forbidden", forceLoad: true);
             return;
         }
 
         await LoadData();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (ProductionPlanQuangNds != null)
+        {
+            await JS.InvokeVoidAsync("initializePagination");
+        }
     }
 
     private async Task LoadData()

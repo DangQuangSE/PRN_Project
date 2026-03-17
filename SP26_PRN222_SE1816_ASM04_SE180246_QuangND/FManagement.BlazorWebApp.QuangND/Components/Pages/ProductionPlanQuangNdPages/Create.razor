@@ -1,9 +1,11 @@
-﻿@page "/productionplanquangnds/create"
+@page "/productionplanquangnds/create"
+@attribute [Authorize]
 @using FManagement.Services.QuangND
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.Authorization
 @using FManagement.Entities.QuangND.Entities
 @inject IProductPlanQuangNDService _productPlanQuangNDService
-@inject SystemAccountService SystemAccountService
+@inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 
 <PageTitle>Create</PageTitle>
@@ -116,8 +118,11 @@
     protected override async Task OnInitializedAsync()
     {
         // Check authentication
-        var currentUserId = SystemAccountService.GetCurrentUserId();
-        if (currentUserId == null || currentUserId <= 0)
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var userIdClaim = user.FindFirst("UserId")?.Value;
+        
+        if (!int.TryParse(userIdClaim, out int currentUserId) || currentUserId <= 0)
         {
             NavigationManager.NavigateTo("/forbidden", forceLoad: true);
             return;
@@ -142,7 +147,7 @@
                 ActualProducedQuantity = 0,
                 BatchNotes = "",
                 IsDeleted = false,
-                LastModifiedBy = currentUserId.Value
+                LastModifiedBy = currentUserId
             };
         }
     }

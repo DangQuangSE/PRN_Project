@@ -1,9 +1,11 @@
-﻿@page "/productionplanquangnds/delete"
+@page "/productionplanquangnds/delete"
+@attribute [Authorize]
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.Authorization
 @using FManagement.Entities.QuangND.Entities
 @using FManagement.Services.QuangND
 @inject IProductPlanQuangNDService ProductPlanService
-@inject SystemAccountService SystemAccountService
+@inject AuthenticationStateProvider AuthStateProvider
 @inject IDbContextFactory<FranchiseManagementContext> DbFactory
 @inject NavigationManager NavigationManager
 
@@ -86,12 +88,16 @@
     protected override async Task OnInitializedAsync()
     {
         // Check authentication
-        CurrentUserId = SystemAccountService.GetCurrentUserId();
-        if (CurrentUserId == null || CurrentUserId <= 0)
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var userIdClaim = user.FindFirst("UserId")?.Value;
+        
+        if (!int.TryParse(userIdClaim, out int currentUserId) || currentUserId <= 0)
         {
             NavigationManager.NavigateTo("/forbidden", forceLoad: true);
             return;
         }
+        CurrentUserId = currentUserId;
 
         using var context = DbFactory.CreateDbContext();
         productionplanquangnd = await context.ProductionPlanQuangNds.FirstOrDefaultAsync(m => m.PlanId == PlanId);

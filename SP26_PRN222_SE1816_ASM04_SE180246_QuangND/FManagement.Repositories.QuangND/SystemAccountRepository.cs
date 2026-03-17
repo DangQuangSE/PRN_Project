@@ -15,7 +15,7 @@ namespace FManagement.Repositories.QuangND
         public SystemAccountRepository(FranchiseManagementContext context) => _context = context;
         public async Task<SystemUserAccount> GetByUserAccountAsync(string username, string password)
         {
-            return await _context.SystemUserAccounts.FirstOrDefaultAsync(u => u.UserName == username && u.Password == password && u.IsActive)?? new SystemUserAccount();
+            return await _context.SystemUserAccounts.FirstOrDefaultAsync(u => u.UserName == username && u.Password == password && u.IsActive) ?? new SystemUserAccount();
         }
     }
 }

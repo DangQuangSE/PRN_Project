@@ -1,0 +1,13 @@
+@page "/logout"
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var authProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+        await authProvider.MarkUserAsLoggedOut();
+        NavigationManager.NavigateTo("/login", forceLoad: true);
+    }
+}
+

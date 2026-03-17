@@ -1,52 +1,87 @@
 @page "/login"
+@attribute [AllowAnonymous]
 @using FManagement.Services.QuangND
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @inject SystemAccountService SystemAccountService
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Login</PageTitle>
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h3>Login</h3>
-                </div>
-                <div class="card-body">
-                    @if (!string.IsNullOrEmpty(errorMessage))
-                    {
-                        <div class="alert alert-danger">@errorMessage</div>
-                    }
-                    <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
-                        <DataAnnotationsValidator />
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <InputText id="username" @bind-Value="loginModel.Username" class="form-control" />
-                            <ValidationMessage For="() => loginModel.Username" class="text-danger" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <InputText id="password" @bind-Value="loginModel.Password" type="password" class="form-control" />
-                            <ValidationMessage For="() => loginModel.Password" class="text-danger" />
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Login</button>
-                    </EditForm>
+@if (isAuthenticated)
+{
+    <div class="container mt-5 text-center">
+        <p>You are already logged in. Redirecting...</p>
+    </div>
+}
+else
+{
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Login</h3>
+                    </div>
+                    <div class="card-body">
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <div class="alert alert-danger">@errorMessage</div>
+                        }
+                        <EditForm Model="loginModel" OnValidSubmit="HandleLogin" FormName="LoginForm">
+                            <DataAnnotationsValidator />
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <InputText id="username" @bind-Value="loginModel.Username" class="form-control" />
+                                <ValidationMessage For="() => loginModel.Username" class="text-danger" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <InputText id="password" @bind-Value="loginModel.Password" type="password" class="form-control" />
+                                <ValidationMessage For="() => loginModel.Password" class="text-danger" />
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Login</button>
+                        </EditForm>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+}
 
 @code {
-    private LoginModel loginModel = new();
+    [SupplyParameterFromForm(FormName = "LoginForm")]
+    private LoginModel loginModel { get; set; } = new();
     private string? errorMessage;
+    private bool isAuthenticated;
+    [SupplyParameterFromQuery]
+    private string? returnUrl { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
+
+        if (isAuthenticated)
+        {
+            NavigationManager.NavigateTo(returnUrl ?? "/productionplanquangnds", forceLoad: true);
+        }
+    }
 
     private async Task HandleLogin()
     {
-        var result = await SystemAccountService.LoginAsync(loginModel.Username, loginModel.Password);
-        if (result)
+        var user = await SystemAccountService.GetByUserAccountAsync(loginModel.Username, loginModel.Password);
+        if (user != null && user.UserAccountId > 0)
         {
-            NavigationManager.NavigateTo("/productionplanquangnds", forceLoad: true);
+            var authProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+            await authProvider.MarkUserAsAuthenticated(user.UserName, user.UserAccountId, user.RoleId);
+
+            // Wait for cookie to be set
+            await Task.Delay(100);
+
+            // Use NavigateTo without forceLoad to keep the circuit
+            NavigationManager.NavigateTo(returnUrl ?? "/productionplanquangnds");
         }
         else
         {
@@ -56,8 +91,8 @@
 
     private class LoginModel
     {
-        public string Username { get; set; } = "";
-        public string Password { get; set; } = "";
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
     }
 }
 
