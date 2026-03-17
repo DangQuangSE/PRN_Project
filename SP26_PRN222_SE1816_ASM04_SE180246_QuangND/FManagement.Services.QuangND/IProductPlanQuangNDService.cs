@@ -9,11 +9,13 @@ namespace FManagement.Services.QuangND
 {
     public interface IProductPlanQuangNDService
     {
-        // Query methods:
         Task<List<ProductionPlanQuangNd>> GetAllAsync();
         Task<ProductionPlanQuangNd> GetByIdAysnc(int id);
-        Task<List<ProductionPlanQuangNd>> SearchAsync(int id, int quantityOrdered, string PlanStatus);
-        // Mutation methods:
+        Task<List<ProductionPlanQuangNd>> SearchAsync(
+            string? planStatus,
+            DateOnly? fromDate,
+            DateOnly? toDate,
+            int? productId);
         Task<int> CreateAsync(ProductionPlanQuangNd productionPlanQuangNd);
         Task<int> UpdateAsync(ProductionPlanQuangNd productionPlanQuangNd);
         Task<bool> DeleteAsync(int id);
