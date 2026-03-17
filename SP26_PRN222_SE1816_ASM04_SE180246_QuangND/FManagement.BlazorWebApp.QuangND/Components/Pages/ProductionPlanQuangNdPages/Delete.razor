@@ -1,12 +1,13 @@
 @page "/productionplanquangnds/delete"
+@attribute [RequireAntiforgeryToken(required: false)]
 @attribute [Authorize]
+@using Microsoft.AspNetCore.Antiforgery
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.Authorization
 @using FManagement.Entities.QuangND.Entities
 @using FManagement.Services.QuangND
 @inject IProductPlanQuangNDService ProductPlanService
 @inject AuthenticationStateProvider AuthStateProvider
-@inject IDbContextFactory<FranchiseManagementContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>Delete</PageTitle>
@@ -83,24 +84,10 @@
     [SupplyParameterFromQuery]
     private int PlanId { get; set; }
 
-    private int? CurrentUserId { get; set; }
-
     protected override async Task OnInitializedAsync()
     {
-        // Check authentication
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        var userIdClaim = user.FindFirst("UserId")?.Value;
-        
-        if (!int.TryParse(userIdClaim, out int currentUserId) || currentUserId <= 0)
-        {
-            NavigationManager.NavigateTo("/forbidden", forceLoad: true);
-            return;
-        }
-        CurrentUserId = currentUserId;
-
-        using var context = DbFactory.CreateDbContext();
-        productionplanquangnd = await context.ProductionPlanQuangNds.FirstOrDefaultAsync(m => m.PlanId == PlanId);
+        // Load data via Service
+        productionplanquangnd = await ProductPlanService.GetByIdAysnc(PlanId);
 
         if (productionplanquangnd is null)
         {
@@ -112,7 +99,18 @@
     {
         if (productionplanquangnd == null) return;
 
-        var result = await ProductPlanService.DeleteAsync(productionplanquangnd.PlanId, CurrentUserId);
+        // Fetch user dynamically if required for service
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var userIdClaim = user.FindFirst("UserId")?.Value;
+        int? currentUserId = null;
+        
+        if (int.TryParse(userIdClaim, out int uid) && uid > 0)
+        {
+            currentUserId = uid;
+        }
+
+        var result = await ProductPlanService.DeleteAsync(productionplanquangnd.PlanId, currentUserId);
         NavigationManager.NavigateTo("/productionplanquangnds");
     }
 }

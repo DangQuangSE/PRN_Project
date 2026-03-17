@@ -1,12 +1,13 @@
 @page "/productionplanquangnds/edit"
+@attribute [RequireAntiforgeryToken(required: false)]
 @attribute [Authorize]
+@using Microsoft.AspNetCore.Antiforgery
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.Authorization
 @using FManagement.Entities.QuangND.Entities
 @using FManagement.Services.QuangND
 @inject IProductPlanQuangNDService ProductPlanService
 @inject AuthenticationStateProvider AuthStateProvider
-@inject IDbContextFactory<FranchiseManagementContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>Edit</PageTitle>
@@ -103,24 +104,10 @@ else
     [SupplyParameterFromForm]
     private ProductionPlanQuangNd? ProductionPlanQuangNd { get; set; }
 
-    private int? CurrentUserId { get; set; }
-
     protected override async Task OnInitializedAsync()
     {
-        // Check authentication
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        var userIdClaim = user.FindFirst("UserId")?.Value;
-        
-        if (!int.TryParse(userIdClaim, out int currentUserId) || currentUserId <= 0)
-        {
-            NavigationManager.NavigateTo("/forbidden", forceLoad: true);
-            return;
-        }
-        CurrentUserId = currentUserId;
-
         // Load data via Service
-        ProductionPlanQuangNd = await ProductPlanService.GetByIdAysnc(PlanId);
+        ProductionPlanQuangNd ??= await ProductPlanService.GetByIdAysnc(PlanId);
 
         if (ProductionPlanQuangNd is null)
         {
@@ -128,22 +115,30 @@ else
         }
     }
 
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task UpdateProductionPlanQuangNd()
     {
         if (ProductionPlanQuangNd == null) return;
 
-        // Set LastModifiedBy to current user
-        ProductionPlanQuangNd.LastModifiedBy = CurrentUserId;
+        try
+        {
+            // We fetch the current user dynamically on save
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            var userIdClaim = user.FindFirst("UserId")?.Value;
+            
+            if (int.TryParse(userIdClaim, out int currentUserId) && currentUserId > 0)
+            {
+                ProductionPlanQuangNd.LastModifiedBy = currentUserId;
+            }
 
-        var result = await ProductPlanService.UpdateAsync(ProductionPlanQuangNd);
+            await ProductPlanService.UpdateAsync(ProductionPlanQuangNd);
+        }
+        catch (Exception)
+        {
+            NavigationManager.NavigateTo("notfound");
+            return;
+        }
+
         NavigationManager.NavigateTo("/productionplanquangnds");
-    }
-
-    private bool ProductionPlanQuangNdExists(int planid)
-    {
-        using var context = DbFactory.CreateDbContext();
-        return context.ProductionPlanQuangNds.Any(e => e.PlanId == planid);
     }
 }

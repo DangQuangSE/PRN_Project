@@ -1,4 +1,5 @@
 @page "/productionplanquangnds"
+@rendermode InteractiveServer
 @attribute [Authorize]
 @using FManagement.Services.QuangND
 @using Microsoft.EntityFrameworkCore
@@ -10,149 +11,128 @@
 @inject NavigationManager NavigationManager
 <PageTitle>Index</PageTitle>
 
-<h1>Index</h1>
+<AuthorizeView>
+    <Authorized>
+        <h1>Index</h1>
 
-<p>
-    <a href="productionplanquangnds/create">Create New</a>
-</p>
-
-<!-- Search Form -->
-<div class="mb-4">
-    <EditForm Model="searchModel" OnSubmit="SearchData">
-        <div class="row g-3">
+        <div class="row mb-3 align-items-end">
             <div class="col-md-3">
                 <label class="form-label">Plan Status</label>
-                <InputSelect id="planstatus" @bind-Value="searchModel.PlanStatus" class="form-select">
+                <select id="planstatus" @bind="searchPlanStatus" class="form-select">
                     <option value="">All</option>
                     <option value="Pending">Pending</option>
                     <option value="In Progress">In Progress</option>
                     <option value="Completed">Completed</option>
                     <option value="Cancelled">Cancelled</option>
-                </InputSelect>
+                </select>
             </div>
             <div class="col-md-3">
                 <label class="form-label">From Date</label>
-                <InputDate @bind-Value="searchModel.FromDate" class="form-control" />
+                <input type="date" @bind="searchFromDate" class="form-control" />
             </div>
             <div class="col-md-3">
                 <label class="form-label">To Date</label>
-                <InputDate @bind-Value="searchModel.ToDate" class="form-control" />
+                <input type="date" @bind="searchToDate" class="form-control" />
             </div>
-            <div class="col-md-3 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary me-2">Search</button>
-                <button type="button" class="btn btn-secondary" @onclick="ClearSearch">Clear</button>
+            <div class="col-md-3 d-flex gap-2">
+                <button class="btn btn-primary w-50" @onclick="PerformSearch">Search</button>
+                <a href="productionplanquangnds/create" class="btn btn-success w-50">Create New</a>
             </div>
         </div>
-    </EditForm>
-</div>
 
-<table class="table table-hover align-middle mb-0" id="productionPlansTable">
-    <thead class="table-light">
-        <tr>
-            <th>PlanId</th>
-            <th>Store Order Item</th>
-            <th>Kitchen</th>
-            <th>Plan Date</th>
-            <th>Start Time</th>
-            <th>End Time</th>
-            <th>Plan Status</th>
-            <th>Priority Level</th>
-            <th>Total Expected Quantity</th>
-            <th>Actual Produced Quantity</th>
-            <th>Last Modified By</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody id="productionPlansTableBody">
-        @if (ProductionPlanQuangNds != null)
-        {
-            @foreach (var plan in ProductionPlanQuangNds)
-            {
-                <tr>
-                    <td>@plan.PlanId</td>
-                    <td>@(plan.StoreOrderItem?.Product?.ProductName)</td>
-                    <td>@(plan.Kitchen?.KitchenName)</td>
-                    <td>@plan.PlanDate</td>
-                    <td>@plan.StartTime</td>
-                    <td>@plan.EndTime</td>
-                    <td>@plan.PlanStatus</td>
-                    <td>@plan.PriorityLevel</td>
-                    <td>@plan.TotalExpectedQuantity</td>
-                    <td>@plan.ActualProducedQuantity</td>
-                    <td>@plan.LastModifiedBy</td>
-                    <td>
-                        <a href="@($"productionplanquangnds/edit?planid={plan.PlanId}")">Edit</a> |
-                        <a href="@($"productionplanquangnds/details?planid={plan.PlanId}")">Details</a> |
-                        <a href="@($"productionplanquangnds/delete?planid={plan.PlanId}")">Delete</a>
-                    </td>
-                </tr>
-            }
-        }
-    </tbody>
-</table>
+        <QuickGrid Class="table" Items="FilteredPlans" Pagination="pagination">
+            <PropertyColumn Property="plan => plan.PlanId" Title="PlanId" />
+            <TemplateColumn Context="plan" Title="Store Order Item">
+                @(plan.StoreOrderItem?.Product?.ProductName)
+            </TemplateColumn>
+            <TemplateColumn Context="plan" Title="Kitchen">
+                @(plan.Kitchen?.KitchenName)
+            </TemplateColumn>
+            <PropertyColumn Property="plan => plan.PlanDate" Title="Plan Date" />
+            <PropertyColumn Property="plan => plan.StartTime" Title="Start Time" />
+            <PropertyColumn Property="plan => plan.EndTime" Title="End Time" />
+            <PropertyColumn Property="plan => plan.PlanStatus" Title="Plan Status" />
+            <PropertyColumn Property="plan => plan.PriorityLevel" Title="Priority Level" />
+            <PropertyColumn Property="plan => plan.TotalExpectedQuantity" Title="Total Expected Quantity" />
+            <PropertyColumn Property="plan => plan.ActualProducedQuantity" Title="Actual Produced Quantity" />
+            <PropertyColumn Property="plan => plan.LastModifiedBy" Title="Last Modified By" />
 
-<!-- Pagination -->
-<div class="row mt-3">
-    <div class="col-12">
-        <nav aria-label="Table pagination">
-            <ul class="pagination justify-content-center" id="pagination"></ul>
-        </nav>
-    </div>
-</div>
+            <TemplateColumn Context="plan" Title="Actions">
+                <a href="@($"productionplanquangnds/edit?planid={plan.PlanId}")">Edit</a> |
+                <a href="@($"productionplanquangnds/details?planid={plan.PlanId}")">Details</a> |
+                <a href="@($"productionplanquangnds/delete?planid={plan.PlanId}")">Delete</a>
+            </TemplateColumn>
+        </QuickGrid>
+        <Paginator State="pagination" />
+    </Authorized>
+    <NotAuthorized>
+        <h3>Access denied</h3>
+        <p>You must be signed in to view this page. <a href="/Account/Login">Sign in</a>.</p>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
-    private IQueryable<ProductionPlanQuangNd> ProductionPlanQuangNds = default!;
-    private SearchModel searchModel = new();
+    private IQueryable<ProductionPlanQuangNd>? _productionPlans;
+    private PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
 
-    private class SearchModel
+    private string? searchPlanStatus;
+    private DateOnly? searchFromDate;
+    private DateOnly? searchToDate;
+
+    // applied variables for the Grid
+    private string? appliedPlanStatus;
+    private DateOnly? appliedFromDate;
+    private DateOnly? appliedToDate;
+
+    // We fetch EVERYTHING first then use QuickGrid filtering over the Queryable based on perform Search
+    // Because that's how Bach's Grid works (in-memory filtering after db scan vs IQueryable from service).
+    // Actually Bach uses normal filtering query. Let's do that!
+    
+    private void PerformSearch()
     {
-        public string? PlanStatus { get; set; }
-        public DateOnly? FromDate { get; set; }
-        public DateOnly? ToDate { get; set; }
+        appliedPlanStatus = searchPlanStatus;
+        appliedFromDate = searchFromDate;
+        appliedToDate = searchToDate;
+    }
+
+    private IQueryable<ProductionPlanQuangNd> FilteredPlans
+    {
+        get
+        {
+            var result = _productionPlans ?? Enumerable.Empty<ProductionPlanQuangNd>().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(appliedPlanStatus))
+            {
+                result = result.Where(x => x.PlanStatus == appliedPlanStatus);
+            }
+
+            if (appliedFromDate.HasValue)
+            {
+                result = result.Where(x => x.PlanDate >= appliedFromDate.Value);
+            }
+
+            if (appliedToDate.HasValue)
+            {
+                result = result.Where(x => x.PlanDate <= appliedToDate.Value);
+            }
+
+            return result;
+        }
     }
 
     protected override async Task OnInitializedAsync()
     {
-        // Check authentication
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        var userIdClaim = user.FindFirst("UserId")?.Value;
-        
-        if (!int.TryParse(userIdClaim, out int currentUserId) || currentUserId <= 0)
+        // Notice we don't kick user out here manually because AuthorizeView handles the UI state.
+        try 
         {
-            NavigationManager.NavigateTo("/forbidden", forceLoad: true);
-            return;
-        }
-
-        await LoadData();
-    }
-
-    private async Task LoadData()
-    {
-        try
-        {
-            var items = await _productPlanQuangNDService.SearchAsync(
-                searchModel.PlanStatus,
-                searchModel.FromDate,
-                searchModel.ToDate,
-                null
-            );
-            ProductionPlanQuangNds = items.AsQueryable();
+            // Just get all because QuickGrid + FilteredPlans filters them
+            var items = await _productPlanQuangNDService.SearchAsync(null, null, null, null);
+            _productionPlans = items.AsQueryable();
         }
         catch (Exception ex)
         {
-            throw new Exception("Error loading data: " + ex.Message);
+            Console.Error.WriteLine($"Error loading production plans: {ex.Message}");
+            _productionPlans = Enumerable.Empty<ProductionPlanQuangNd>().AsQueryable();
         }
-    }
-
-    private async Task SearchData()
-    {
-        await LoadData();
-    }
-
-    private async Task ClearSearch()
-    {
-        searchModel = new SearchModel();
-        await LoadData();
     }
 }
