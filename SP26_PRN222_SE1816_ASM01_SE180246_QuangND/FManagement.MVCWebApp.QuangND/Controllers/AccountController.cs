@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -36,6 +36,7 @@ namespace FManagement.MVCWebApp.QuangND.Controllers
                 {
                     var claims = new List<Claim>
                                 {
+                                    new Claim(ClaimTypes.NameIdentifier, userAccount.UserAccountId.ToString()),
                                     new Claim(ClaimTypes.Name, userAccount.UserName),
                                     new Claim(ClaimTypes.Role, userAccount.RoleId.ToString())
                                 };
@@ -62,6 +63,8 @@ namespace FManagement.MVCWebApp.QuangND.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            Response.Cookies.Delete("UserName");
+            Response.Cookies.Delete("Role");
             return RedirectToAction("Login", "Account");
         }
 

@@ -1,0 +1,63 @@
+@page "/productionplanquangnds/details"
+@using FManagement.Services.QuangND
+@using FManagement.Entities.QuangND.Entities
+@inject IProductPlanQuangNDService ProductPlanService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>ProductionPlanQuangNd</h2>
+    <hr />
+    @if (productionplanquangnd is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">StoreOrderItem</dt>
+            <dd class="col-sm-10">@($"{productionplanquangnd.StoreOrderItem?.Product?.ProductName} (Order: {productionplanquangnd.StoreOrderItem?.OrderId})")</dd>
+            <dt class="col-sm-2">Kitchen</dt>
+            <dd class="col-sm-10">@productionplanquangnd.Kitchen?.KitchenName</dd>
+            <dt class="col-sm-2">PlanDate</dt>
+            <dd class="col-sm-10">@productionplanquangnd.PlanDate</dd>
+            <dt class="col-sm-2">StartTime</dt>
+            <dd class="col-sm-10">@productionplanquangnd.StartTime</dd>
+            <dt class="col-sm-2">EndTime</dt>
+            <dd class="col-sm-10">@productionplanquangnd.EndTime</dd>
+            <dt class="col-sm-2">PlanStatus</dt>
+            <dd class="col-sm-10">@productionplanquangnd.PlanStatus</dd>
+            <dt class="col-sm-2">PriorityLevel</dt>
+            <dd class="col-sm-10">@productionplanquangnd.PriorityLevel</dd>
+            <dt class="col-sm-2">TotalExpectedQuantity</dt>
+            <dd class="col-sm-10">@productionplanquangnd.TotalExpectedQuantity</dd>
+            <dt class="col-sm-2">ActualProducedQuantity</dt>
+            <dd class="col-sm-10">@productionplanquangnd.ActualProducedQuantity</dd>
+            <dt class="col-sm-2">BatchNotes</dt>
+            <dd class="col-sm-10">@productionplanquangnd.BatchNotes</dd>
+        </dl>
+        <div>
+            <a href="@($"/productionplanquangnds/edit?planid={productionplanquangnd.PlanId}")">Edit</a> |
+            <a href="@($"/productionplanquangnds")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private ProductionPlanQuangNd? productionplanquangnd;
+
+    [SupplyParameterFromQuery]
+    private int PlanId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        productionplanquangnd = await ProductPlanService.GetByIdAsync(PlanId);
+
+        if (productionplanquangnd is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

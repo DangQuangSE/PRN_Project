@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using FManagement.Entities.QuangND.Entities;
 using FManagement.Services.QuangND;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace FManagement.MVCWebApp.QuangND.Controllers
 {
@@ -61,7 +62,6 @@ namespace FManagement.MVCWebApp.QuangND.Controllers
             return View(items);
         }
 
-        // GET: ProductionPlanQuangNds/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -78,7 +78,6 @@ namespace FManagement.MVCWebApp.QuangND.Controllers
         }
 
 
-        // GET: ProductionPlanQuangNds/Create
         [Authorize(Roles = "1,2")]
         public async Task<IActionResult> Create()
         {
@@ -96,8 +95,18 @@ namespace FManagement.MVCWebApp.QuangND.Controllers
         [Authorize(Roles = "1,2")]
         public async Task<IActionResult> Create(ProductionPlanQuangNd productionPlanQuangNd)
         {
+            ModelState.Remove("Kitchen");
+            ModelState.Remove("StoreOrderItem");
+            ModelState.Remove("ProductBatches");
+
             if (ModelState.IsValid)
             {
+                var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (int.TryParse(userIdClaim, out int userId))
+                {
+                    productionPlanQuangNd.LastModifiedBy = userId;
+                }
+
                 var result = await _productPlanQuangNDService.CreateAsync(productionPlanQuangNd);
                 if (result > 0)
                 {
@@ -109,7 +118,6 @@ namespace FManagement.MVCWebApp.QuangND.Controllers
         }
 
 
-        // GET: ProductionPlanQuangNds/Edit/5
         [Authorize(Roles = "1,2")]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -135,10 +143,20 @@ namespace FManagement.MVCWebApp.QuangND.Controllers
         [Authorize(Roles = "1,2")]
         public async Task<IActionResult> Edit(ProductionPlanQuangNd productionPlanQuangNd)
         {
+            ModelState.Remove("Kitchen");
+            ModelState.Remove("StoreOrderItem");
+            ModelState.Remove("ProductBatches");
+
             if (ModelState.IsValid)
             {
                 try
                 {
+                    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    if (int.TryParse(userIdClaim, out int userId))
+                    {
+                        productionPlanQuangNd.LastModifiedBy = userId;
+                    }
+
                     var result = await _productPlanQuangNDService.UpdateAsync(productionPlanQuangNd);
                     if (result > 0)
                     {

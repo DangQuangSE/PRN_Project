@@ -1,0 +1,43 @@
+@page "/productionplanquangnds"
+@using FManagement.Services.QuangND
+@using FManagement.Entities.QuangND.Entities
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject IProductPlanQuangNDService ProductPlanService
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="productionplanquangnds/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="ProductionPlans.AsQueryable()">
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.StoreOrderItemId" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.KitchenId" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.PlanDate" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.StartTime" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.EndTime" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.PlanStatus" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.PriorityLevel" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.TotalExpectedQuantity" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.ActualProducedQuantity" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.BatchNotes" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.LastModifiedBy" />
+    <PropertyColumn Property="productionplanquangnd => productionplanquangnd.IsDeleted" />
+
+    <TemplateColumn Context="productionplanquangnd">
+        <a href="@($"productionplanquangnds/edit?planid={productionplanquangnd.PlanId}")">Edit</a> |
+        <a href="@($"productionplanquangnds/details?planid={productionplanquangnd.PlanId}")">Details</a> |
+        <a href="@($"productionplanquangnds/delete?planid={productionplanquangnd.PlanId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private List<ProductionPlanQuangNd> ProductionPlans = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ProductionPlans = await ProductPlanService.GetAllAsync();
+    }
+}

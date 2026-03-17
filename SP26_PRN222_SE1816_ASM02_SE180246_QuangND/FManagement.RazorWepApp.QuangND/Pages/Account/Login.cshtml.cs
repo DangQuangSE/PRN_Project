@@ -38,6 +38,7 @@ namespace FManagement.RazorWepApp.QuangND.Pages.Account
                 {
                     new Claim(ClaimTypes.Name, UserName),
                     new Claim(ClaimTypes.Role, userAccount.RoleId.ToString()),
+                    new Claim("UserId", userAccount.UserAccountId.ToString()) // Tracking User ID for LastModifiedBy
                 };
 
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

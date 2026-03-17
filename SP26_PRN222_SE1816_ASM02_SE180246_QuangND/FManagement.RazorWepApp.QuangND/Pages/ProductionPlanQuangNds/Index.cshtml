@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model FManagement.RazorWepApp.QuangND.Pages.ProductionPlanQuangNds.IndexModel
 
 @{
@@ -105,7 +105,19 @@
                             <td>@Html.DisplayFor(modelItem => item.StartTime)</td>
                             <td>@Html.DisplayFor(modelItem => item.EndTime)</td>
                             <td>@Html.DisplayFor(modelItem => item.PlanStatus)</td>
-                            <td class="text-center">@Html.DisplayFor(modelItem => item.PriorityLevel)</td>
+                            <td class="text-center">
+                                @{
+                                    var priorityValue = item.PriorityLevel ?? 0;
+                                    var priorityText = priorityValue switch
+                                    {
+                                        2 => "High",
+                                        1 => "Medium",
+                                        0 => "Low",
+                                        _ => "N/A"
+                                    };
+                                }
+                                @priorityText
+                            </td>
                             <td class="text-center">
                                 <strong class="text-primary">@Html.DisplayFor(modelItem => item.TotalExpectedQuantity)</strong>
                             </td>
@@ -144,35 +156,51 @@
                 </table>
             </div>
         </div>
+    <!-- Pagination -->
+    <div class="row mt-3">
+        <div class="col-12">
+            <nav aria-label="Table pagination">
+                <ul class="pagination justify-content-center" id="pagination"></ul>
+            </nav>
+        </div>
     </div>
 </div>
 
 @section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/table-pagination.js"></script>
     <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+    <script>
+        $(function() {
+            $('#productionPlansTable').createTablePagination({
+                rowPerPage: 2,
+            });
+        });
+    </script>
     <script>
         "use strict";
 
-        // Khởi tạo kết nối SignalR
         var connection = new signalR.HubConnectionBuilder()
             .withUrl("/productionPlanHub")
             .build();
 
-        // Bắt đầu kết nối
         connection.start().then(function () {
             console.log("QuangND: Connected to SignalR Hub");
         }).catch(function (err) {
             console.error("Error connecting to SignalR Hub: " + err.toString());
         });
 
-        // Helper: tạo row HTML cho một plan
         function createPlanRow(plan) {
+            var priorityValue = parseInt(plan.priorityLevel) || 0;
+            var priorityText = priorityValue === 2 ? "High" : (priorityValue === 1 ? "Medium" : (priorityValue === 0 ? "Low" : "N/A"));
+
             var trHtml = `
                 <tr data-plan-id="${plan.planId}">
                     <td><i class="bi bi-calendar3 text-muted"></i> ${plan.planDate ?? ''}</td>
                     <td>${plan.startTime ? new Date(plan.startTime).toLocaleString() : ''}</td>
                     <td>${plan.endTime ? new Date(plan.endTime).toLocaleString() : ''}</td>
                     <td>${plan.planStatus ?? ''}</td>
-                    <td class="text-center">${plan.priorityLevel ?? ''}</td>
+                    <td class="text-center">${priorityText}</td>
                     <td class="text-center"><strong class="text-primary">${plan.totalExpectedQuantity ?? ''}</strong></td>
                     <td class="text-center"><strong class="text-success">${plan.actualProducedQuantity ?? ''}</strong></td>
                     <td><small class="text-muted">${plan.batchNotes ?? ''}</small></td>
@@ -192,7 +220,6 @@
             return trHtml;
         }
 
-        // Helper: hiển thị empty state khi bảng trống
         function showEmptyState() {
             var tbody = document.getElementById('productionPlansTableBody');
             if (tbody.querySelectorAll('tr[data-plan-id]').length === 0) {
@@ -200,7 +227,6 @@
             }
         }
 
-        // RECEIVER - Lắng nghe event delete từ server
         connection.on("Receiver_DeleteProductionPlan", function (planId) {
             console.log("Received delete event for plan ID: " + planId);
 
@@ -212,32 +238,26 @@
             }
         });
 
-        // RECEIVER - Lắng nghe sự kiện tạo mới
         connection.on("Receiver_CreateProductionPlan", function (item) {
             console.log("New production plan created: ", item);
 
             var tbody = document.getElementById('productionPlansTableBody');
 
-            // Xóa empty state nếu có
             var emptyRow = tbody.querySelector('td[colspan]');
             if (emptyRow) emptyRow.closest('tr').remove();
 
-            // Không thêm nếu đã tồn tại
             if (tbody.querySelector('tr[data-plan-id="' + item.planId + '"]')) return;
 
             var trHtml = createPlanRow(item);
             tbody.insertAdjacentHTML('afterbegin', trHtml);
         });
 
-        // RECEIVER - Lắng nghe sự kiện cập nhật
         connection.on("Receiver_UpdateProductionPlan", function (item) {
             console.log("Production plan updated: ", item);
 
-            // Reload trang để hiển thị dữ liệu mới nhất
             location.reload();
         });
 
-        // Lắng nghe error từ server
         connection.on("Error", function (errorMessage) {
             console.error("Error from server: " + errorMessage);
         });

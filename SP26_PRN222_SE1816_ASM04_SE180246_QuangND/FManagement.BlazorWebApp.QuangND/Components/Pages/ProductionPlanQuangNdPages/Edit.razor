@@ -1,0 +1,153 @@
+@page "/productionplanquangnds/edit"
+@using FManagement.Services.QuangND
+@using FManagement.Entities.QuangND.Entities
+@using Microsoft.EntityFrameworkCore
+@inject IProductPlanQuangNDService ProductPlanService
+@inject ICentralKitchenService KitchenService
+@inject StoreOrderItemQuangNDService OrderItemService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>ProductionPlanQuangNd</h2>
+<hr />
+@if (ProductionPlanQuangNd is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="ProductionPlanQuangNd" OnValidSubmit="UpdateProductionPlanQuangNd" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="ProductionPlanQuangNd.PlanId" value="@ProductionPlanQuangNd.PlanId" />
+                <div class="mb-3">
+                    <label for="storeorderitemid" class="form-label">StoreOrderItem:</label>
+                    <InputSelect id="storeorderitemid" @bind-Value="ProductionPlanQuangNd.StoreOrderItemId" class="form-select">
+                        <option value="">-- Select Store Order Item --</option>
+                        @foreach (var item in OrderItems)
+                        {
+                            <option value="@item.OrderItemId">@($"{item.Product.ProductName} (Order: {item.OrderId})")</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => ProductionPlanQuangNd.StoreOrderItemId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="kitchenid" class="form-label">Kitchen:</label>
+                    <InputSelect id="kitchenid" @bind-Value="ProductionPlanQuangNd.KitchenId" class="form-select">
+                        <option value="">-- Select Kitchen --</option>
+                        @foreach (var kitchen in Kitchens)
+                        {
+                            <option value="@kitchen.KitchenId">@kitchen.KitchenName</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => ProductionPlanQuangNd.KitchenId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="plandate" class="form-label">PlanDate:</label>
+                    <InputDate id="plandate" @bind-Value="ProductionPlanQuangNd.PlanDate" class="form-control" />
+                    <ValidationMessage For="() => ProductionPlanQuangNd.PlanDate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="starttime" class="form-label">StartTime:</label>
+                    <InputDate id="starttime" @bind-Value="ProductionPlanQuangNd.StartTime" class="form-control" />
+                    <ValidationMessage For="() => ProductionPlanQuangNd.StartTime" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="endtime" class="form-label">EndTime:</label>
+                    <InputDate id="endtime" @bind-Value="ProductionPlanQuangNd.EndTime" class="form-control" />
+                    <ValidationMessage For="() => ProductionPlanQuangNd.EndTime" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="planstatus" class="form-label">PlanStatus:</label>
+                    <InputText id="planstatus" @bind-Value="ProductionPlanQuangNd.PlanStatus" class="form-control" />
+                    <ValidationMessage For="() => ProductionPlanQuangNd.PlanStatus" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="prioritylevel" class="form-label">PriorityLevel:</label>
+                    <InputNumber id="prioritylevel" @bind-Value="ProductionPlanQuangNd.PriorityLevel" class="form-control" />
+                    <ValidationMessage For="() => ProductionPlanQuangNd.PriorityLevel" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="totalexpectedquantity" class="form-label">TotalExpectedQuantity:</label>
+                    <InputNumber id="totalexpectedquantity" @bind-Value="ProductionPlanQuangNd.TotalExpectedQuantity" class="form-control" />
+                    <ValidationMessage For="() => ProductionPlanQuangNd.TotalExpectedQuantity" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="actualproducedquantity" class="form-label">ActualProducedQuantity:</label>
+                    <InputNumber id="actualproducedquantity" @bind-Value="ProductionPlanQuangNd.ActualProducedQuantity" class="form-control" />
+                    <ValidationMessage For="() => ProductionPlanQuangNd.ActualProducedQuantity" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="batchnotes" class="form-label">BatchNotes:</label>
+                    <InputText id="batchnotes" @bind-Value="ProductionPlanQuangNd.BatchNotes" class="form-control" />
+                    <ValidationMessage For="() => ProductionPlanQuangNd.BatchNotes" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/productionplanquangnds">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int PlanId { get; set; }
+
+    [SupplyParameterFromForm]
+    private ProductionPlanQuangNd? ProductionPlanQuangNd { get; set; }
+
+    private List<StoreOrderItemQuangNd> OrderItems = new();
+    private List<CentralKitchen> Kitchens = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ProductionPlanQuangNd ??= await ProductPlanService.GetByIdAsync(PlanId);
+
+        if (ProductionPlanQuangNd is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+        else
+        {
+            OrderItems = await OrderItemService.GetAllAsync();
+            Kitchens = await KitchenService.GetAllAsync();
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateProductionPlanQuangNd()
+    {
+        try
+        {
+            await ProductPlanService.UpdateAsync(ProductionPlanQuangNd!);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!await ProductionPlanQuangNdExists(ProductionPlanQuangNd!.PlanId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/productionplanquangnds");
+    }
+
+    private async Task<bool> ProductionPlanQuangNdExists(int planid)
+    {
+        var item = await ProductPlanService.GetByIdAsync(planid);
+        return item != null;
+    }
+}

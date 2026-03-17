@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,6 +41,13 @@ namespace FManagement.RazorWepApp.QuangND.Pages.ProductionPlanQuangNds
             {
                 return NotFound();
             }
+
+            var userIdClaim = User.FindFirst("UserId");
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            {
+                productionplanquangnd.LastModifiedBy = userId;
+            }
+
             ProductionPlanQuangNd = productionplanquangnd;
             await PopulateDropdownsAsync(productionplanquangnd);
             return Page();
@@ -52,6 +59,12 @@ namespace FManagement.RazorWepApp.QuangND.Pages.ProductionPlanQuangNds
             {
                 await PopulateDropdownsAsync(ProductionPlanQuangNd);
                 return Page();
+            }
+
+            var userIdClaim = User.FindFirst("UserId");
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            {
+                ProductionPlanQuangNd.LastModifiedBy = userId;
             }
 
             var result = await _productPlanQuangNDService.UpdateAsync(ProductionPlanQuangNd);

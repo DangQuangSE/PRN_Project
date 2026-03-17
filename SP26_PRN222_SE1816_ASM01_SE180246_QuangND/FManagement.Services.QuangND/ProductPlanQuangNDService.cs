@@ -31,7 +31,6 @@ namespace FManagement.Services.QuangND
                 var item = await _productionPlanQuangNDRepository.GetByIdAysnc(id);
                 if (item != null && item.PlanId > 0)
                 {
-                    // Soft Delete: chỉ đánh dấu IsDeleted = true
                     item.IsDeleted = true;
                     var result = await _productionPlanQuangNDRepository.UpdateAsync(item);
                     return result > 0;
