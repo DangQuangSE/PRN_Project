@@ -1,9 +1,4 @@
 @page "/productionplanquangnds"
-<<<<<<< Updated upstream
-@rendermode InteractiveServer
-@attribute [Authorize]
-=======
->>>>>>> Stashed changes
 @using FManagement.Services.QuangND
 @using FManagement.Entities.QuangND.Entities
 @using Microsoft.AspNetCore.Components.QuickGrid
@@ -11,133 +6,8 @@
 
 <PageTitle>Index</PageTitle>
 
-<AuthorizeView>
-    <Authorized>
-        <h1>Index</h1>
+<h1>Index</h1>
 
-<<<<<<< Updated upstream
-        <div class="row mb-3 align-items-end">
-            <div class="col-md-3">
-                <label class="form-label">Plan Status</label>
-                <select id="planstatus" @bind="searchPlanStatus" class="form-select">
-                    <option value="">All</option>
-                    <option value="Pending">Pending</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">From Date</label>
-                <input type="date" @bind="searchFromDate" class="form-control" />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">To Date</label>
-                <input type="date" @bind="searchToDate" class="form-control" />
-            </div>
-            <div class="col-md-3 d-flex gap-2">
-                <button class="btn btn-primary w-50" @onclick="PerformSearch">Search</button>
-                <a href="productionplanquangnds/create" class="btn btn-success w-50">Create New</a>
-            </div>
-        </div>
-
-        <QuickGrid Class="table" Items="FilteredPlans" Pagination="pagination">
-            <PropertyColumn Property="plan => plan.PlanId" Title="PlanId" />
-            <TemplateColumn Context="plan" Title="Store Order Item">
-                @(plan.StoreOrderItem?.Product?.ProductName)
-            </TemplateColumn>
-            <TemplateColumn Context="plan" Title="Kitchen">
-                @(plan.Kitchen?.KitchenName)
-            </TemplateColumn>
-            <PropertyColumn Property="plan => plan.PlanDate" Title="Plan Date" />
-            <PropertyColumn Property="plan => plan.StartTime" Title="Start Time" />
-            <PropertyColumn Property="plan => plan.EndTime" Title="End Time" />
-            <PropertyColumn Property="plan => plan.PlanStatus" Title="Plan Status" />
-            <PropertyColumn Property="plan => plan.PriorityLevel" Title="Priority Level" />
-            <PropertyColumn Property="plan => plan.TotalExpectedQuantity" Title="Total Expected Quantity" />
-            <PropertyColumn Property="plan => plan.ActualProducedQuantity" Title="Actual Produced Quantity" />
-            <PropertyColumn Property="plan => plan.LastModifiedBy" Title="Last Modified By" />
-
-            <TemplateColumn Context="plan" Title="Actions">
-                <a href="@($"productionplanquangnds/edit?planid={plan.PlanId}")">Edit</a> |
-                <a href="@($"productionplanquangnds/details?planid={plan.PlanId}")">Details</a> |
-                <a href="@($"productionplanquangnds/delete?planid={plan.PlanId}")">Delete</a>
-            </TemplateColumn>
-        </QuickGrid>
-        <Paginator State="pagination" />
-    </Authorized>
-    <NotAuthorized>
-        <h3>Access denied</h3>
-        <p>You must be signed in to view this page. <a href="/Account/Login">Sign in</a>.</p>
-    </NotAuthorized>
-</AuthorizeView>
-
-@code {
-    private IQueryable<ProductionPlanQuangNd>? _productionPlans;
-    private PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
-
-    private string? searchPlanStatus;
-    private DateOnly? searchFromDate;
-    private DateOnly? searchToDate;
-
-    // applied variables for the Grid
-    private string? appliedPlanStatus;
-    private DateOnly? appliedFromDate;
-    private DateOnly? appliedToDate;
-
-    // We fetch EVERYTHING first then use QuickGrid filtering over the Queryable based on perform Search
-    // Because that's how Bach's Grid works (in-memory filtering after db scan vs IQueryable from service).
-    // Actually Bach uses normal filtering query. Let's do that!
-    
-    private void PerformSearch()
-    {
-        appliedPlanStatus = searchPlanStatus;
-        appliedFromDate = searchFromDate;
-        appliedToDate = searchToDate;
-    }
-
-    private IQueryable<ProductionPlanQuangNd> FilteredPlans
-    {
-        get
-        {
-            var result = _productionPlans ?? Enumerable.Empty<ProductionPlanQuangNd>().AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(appliedPlanStatus))
-            {
-                result = result.Where(x => x.PlanStatus == appliedPlanStatus);
-            }
-
-            if (appliedFromDate.HasValue)
-            {
-                result = result.Where(x => x.PlanDate >= appliedFromDate.Value);
-            }
-
-            if (appliedToDate.HasValue)
-            {
-                result = result.Where(x => x.PlanDate <= appliedToDate.Value);
-            }
-
-            return result;
-        }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        // Notice we don't kick user out here manually because AuthorizeView handles the UI state.
-        try 
-        {
-            // Just get all because QuickGrid + FilteredPlans filters them
-            var items = await _productPlanQuangNDService.SearchAsync(null, null, null, null);
-            _productionPlans = items.AsQueryable();
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error loading production plans: {ex.Message}");
-            _productionPlans = Enumerable.Empty<ProductionPlanQuangNd>().AsQueryable();
-        }
-    }
-}
-=======
 <p>
     <a href="productionplanquangnds/create">Create New</a>
 </p>
@@ -171,4 +41,3 @@
         ProductionPlans = await ProductPlanService.GetAllAsync();
     }
 }
->>>>>>> Stashed changes

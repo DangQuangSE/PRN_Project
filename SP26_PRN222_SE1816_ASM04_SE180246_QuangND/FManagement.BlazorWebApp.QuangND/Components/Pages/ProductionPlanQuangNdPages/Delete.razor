@@ -1,20 +1,7 @@
 @page "/productionplanquangnds/delete"
-<<<<<<< Updated upstream
-@attribute [RequireAntiforgeryToken(required: false)]
-@attribute [Authorize]
-@using Microsoft.AspNetCore.Antiforgery
-@using Microsoft.EntityFrameworkCore
-@using Microsoft.AspNetCore.Components.Authorization
-@using FManagement.Entities.QuangND.Entities
-=======
->>>>>>> Stashed changes
 @using FManagement.Services.QuangND
 @using FManagement.Entities.QuangND.Entities
 @inject IProductPlanQuangNDService ProductPlanService
-<<<<<<< Updated upstream
-@inject AuthenticationStateProvider AuthStateProvider
-=======
->>>>>>> Stashed changes
 @inject NavigationManager NavigationManager
 
 <PageTitle>Delete</PageTitle>
@@ -85,12 +72,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-<<<<<<< Updated upstream
-        // Load data via Service
-        productionplanquangnd = await ProductPlanService.GetByIdAysnc(PlanId);
-=======
         productionplanquangnd = await ProductPlanService.GetByIdAsync(PlanId);
->>>>>>> Stashed changes
 
         if (productionplanquangnd is null)
         {
@@ -100,24 +82,7 @@
 
     private async Task DeleteProductionPlanQuangNd()
     {
-<<<<<<< Updated upstream
-        if (productionplanquangnd == null) return;
-
-        // Fetch user dynamically if required for service
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        var userIdClaim = user.FindFirst("UserId")?.Value;
-        int? currentUserId = null;
-        
-        if (int.TryParse(userIdClaim, out int uid) && uid > 0)
-        {
-            currentUserId = uid;
-        }
-
-        var result = await ProductPlanService.DeleteAsync(productionplanquangnd.PlanId, currentUserId);
-=======
         await ProductPlanService.DeleteAsync(PlanId);
->>>>>>> Stashed changes
         NavigationManager.NavigateTo("/productionplanquangnds");
     }
 }

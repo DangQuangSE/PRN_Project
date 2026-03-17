@@ -1,16 +1,8 @@
 @page "/productionplanquangnds/details"
-<<<<<<< Updated upstream
-@attribute [Authorize]
-@using Microsoft.EntityFrameworkCore
-@using FManagement.Entities.QuangND.Entities
-@inject FManagement.Services.QuangND.IProductPlanQuangNDService ProductPlanService
-=======
 @using FManagement.Services.QuangND
 @using FManagement.Entities.QuangND.Entities
 @inject IProductPlanQuangNDService ProductPlanService
->>>>>>> Stashed changes
 @inject NavigationManager NavigationManager
-@inject IDbContextFactory<FranchiseManagementContext> DbFactory
 
 <PageTitle>Details</PageTitle>
 
@@ -61,12 +53,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-<<<<<<< Updated upstream
-        // Load data via Service
-        productionplanquangnd = await ProductPlanService.GetByIdAysnc(PlanId);
-=======
         productionplanquangnd = await ProductPlanService.GetByIdAsync(PlanId);
->>>>>>> Stashed changes
 
         if (productionplanquangnd is null)
         {

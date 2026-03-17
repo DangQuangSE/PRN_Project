@@ -1,23 +1,10 @@
 @page "/productionplanquangnds/edit"
-<<<<<<< Updated upstream
-@attribute [RequireAntiforgeryToken(required: false)]
-@attribute [Authorize]
-@using Microsoft.AspNetCore.Antiforgery
-@using Microsoft.EntityFrameworkCore
-@using Microsoft.AspNetCore.Components.Authorization
-@using FManagement.Entities.QuangND.Entities
-=======
->>>>>>> Stashed changes
 @using FManagement.Services.QuangND
 @using FManagement.Entities.QuangND.Entities
 @using Microsoft.EntityFrameworkCore
 @inject IProductPlanQuangNDService ProductPlanService
-<<<<<<< Updated upstream
-@inject AuthenticationStateProvider AuthStateProvider
-=======
 @inject ICentralKitchenService KitchenService
 @inject StoreOrderItemQuangNDService OrderItemService
->>>>>>> Stashed changes
 @inject NavigationManager NavigationManager
 
 <PageTitle>Edit</PageTitle>
@@ -117,19 +104,12 @@ else
     [SupplyParameterFromForm]
     private ProductionPlanQuangNd? ProductionPlanQuangNd { get; set; }
 
-<<<<<<< Updated upstream
-    protected override async Task OnInitializedAsync()
-    {
-        // Load data via Service
-        ProductionPlanQuangNd ??= await ProductPlanService.GetByIdAysnc(PlanId);
-=======
     private List<StoreOrderItemQuangNd> OrderItems = new();
     private List<CentralKitchen> Kitchens = new();
 
     protected override async Task OnInitializedAsync()
     {
         ProductionPlanQuangNd ??= await ProductPlanService.GetByIdAsync(PlanId);
->>>>>>> Stashed changes
 
         if (ProductionPlanQuangNd is null)
         {
@@ -142,6 +122,8 @@ else
         }
     }
 
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task UpdateProductionPlanQuangNd()
     {
         try
@@ -160,30 +142,6 @@ else
             }
         }
 
-<<<<<<< Updated upstream
-        try
-        {
-            // We fetch the current user dynamically on save
-            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-            var user = authState.User;
-            var userIdClaim = user.FindFirst("UserId")?.Value;
-            
-            if (int.TryParse(userIdClaim, out int currentUserId) && currentUserId > 0)
-            {
-                ProductionPlanQuangNd.LastModifiedBy = currentUserId;
-            }
-
-            await ProductPlanService.UpdateAsync(ProductionPlanQuangNd);
-        }
-        catch (Exception)
-        {
-            NavigationManager.NavigateTo("notfound");
-            return;
-        }
-
-        NavigationManager.NavigateTo("/productionplanquangnds");
-    }
-=======
         NavigationManager.NavigateTo("/productionplanquangnds");
     }
 
@@ -192,5 +150,4 @@ else
         var item = await ProductPlanService.GetByIdAsync(planid);
         return item != null;
     }
->>>>>>> Stashed changes
 }
