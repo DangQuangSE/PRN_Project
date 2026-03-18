@@ -26,7 +26,7 @@ public partial class ProductionPlanQuangNd
     [Range(0, int.MaxValue, ErrorMessage = "TotalExpectedQuantity must be a non-negative integer!")]
     public int? TotalExpectedQuantity { get; set; }
 
-    [Range(0, int.MaxValue, ErrorMessage = "TotalExpectedQuantity must be a non-negative integer!")]
+    [Range(0, int.MaxValue, ErrorMessage = "Produced Quantity must be a non-negative integer!")]
     public int? ActualProducedQuantity { get; set; }
 
     [StringLength(10, ErrorMessage = "BatchNote must have at least 10 characters!")]
