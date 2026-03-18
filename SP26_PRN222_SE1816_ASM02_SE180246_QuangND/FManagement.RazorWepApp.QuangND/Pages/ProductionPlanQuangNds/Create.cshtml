@@ -17,7 +17,7 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <form method="post">
+            <form id="createForm" method="post">
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
                 
                 <div class="row">
@@ -32,6 +32,7 @@
                             <select asp-for="ProductionPlanQuangNd.StoreOrderItemId" class="form-select" asp-items="ViewBag.StoreOrderItemId">
                                 <option value="">-- Select Order Item --</option>
                             </select>
+                            <span asp-validation-for="ProductionPlanQuangNd.StoreOrderItemId" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
@@ -41,6 +42,8 @@
                             <select asp-for="ProductionPlanQuangNd.KitchenId" class="form-select" asp-items="ViewBag.KitchenId">
                                 <option value="">-- Select Kitchen --</option>
                             </select>
+                            <span asp-validation-for="ProductionPlanQuangNd.KitchenId" class="text-danger"></span>
+
                         </div>
 
                         <div class="mb-3">
@@ -172,6 +175,11 @@
 
         document.getElementById("btnHubCreate").addEventListener("click", function (event) {
             event.preventDefault();
+
+            var form = $("#createForm");
+            if (!form.valid()) {
+                return;
+            }
 
             var dataObj = JSON.stringify({
                 StoreOrderItemId: parseInt(document.getElementById("ProductionPlanQuangNd_StoreOrderItemId").value),
